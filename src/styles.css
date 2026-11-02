@@ -137,6 +137,12 @@ button { font: inherit; }
 .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
 @media (min-width: 900px) { .report { max-width: 560px; padding-top: 40px; } }
 
+.score-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.score-kicker { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #4a4a4a; }
+.score-row .score { font-size: 56px; }
+.score-row .score span { font-size: 24px; }
+.score-date { margin: 0; font-size: 13px; color: var(--soft); }
+
 .footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; font-size: 11px; line-height: 1.5; color: var(--soft); }
 .footer p { margin: 0; }
 .footer-link { font-size: 13px; font-weight: 600; }

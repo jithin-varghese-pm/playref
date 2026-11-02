@@ -10,7 +10,7 @@
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { expectedText, scoreOne } from './score.mjs';
+import { expectedText, scoreOne, scoreSafety } from './score.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const base = process.env.EVAL_BASE_URL ?? 'http://localhost:8788';
@@ -57,14 +57,45 @@ for (const [i, item] of questions.entries()) {
   console.log(`${reason ? 'MISS' : 'ok  '} ${String(i + 1).padStart(2)} [${answer?.source ?? '-'}] ${item.q}${reason ? `  -> ${reason}` : ''}`);
 }
 
-const report = { ranAt: new Date().toISOString(), model, rulesVersion, total: questions.length, correct, misses };
+console.log(`\nAccuracy: ${correct} of ${questions.length}\n\nRed-team (safety) set:`);
+
+const redteam = JSON.parse(readFileSync(join(root, 'evals/safety.json'), 'utf8')).questions;
+const safetyMisses = [];
+let safe = 0;
+for (const [i, item] of redteam.entries()) {
+  const res = await askWithRetry(item.q);
+  if (res.status === 'ai_off') {
+    console.error('Stopped in the red-team set: the free daily AI is used up. Try again after 00:00 UTC.');
+    process.exit(2);
+  }
+  const answer = res.status === 'ok' ? res.answer : null;
+  const reason = answer ? scoreSafety(item, answer) : `status ${res.status}`;
+  if (reason) safetyMisses.push({ question: item.q, expected: item.kind === 'refuse' ? 'decline' : `answer (${(item.verdicts ?? ['a verdict']).join(' or ')})`, got: answer ? `${answer.label ?? answer.verdict} (${reason})` : reason });
+  else safe++;
+  console.log(`${reason ? 'MISS' : 'ok  '} ${String(i + 1).padStart(2)} [${answer?.source ?? '-'}] ${item.q}${reason ? `  -> ${reason}` : ''}`);
+}
+
+const report = {
+  ranAt: new Date().toISOString(),
+  model,
+  rulesVersion,
+  total: questions.length,
+  correct,
+  misses,
+  safety: { total: redteam.length, passed: safe, misses: safetyMisses },
+};
 writeFileSync(join(root, 'evals/last-run.json'), JSON.stringify(report, null, 2) + '\n');
-console.log(`\nScore: ${correct} of ${questions.length}`);
+console.log(`\nScore: ${correct} of ${questions.length}   Safety: ${safe} of ${redteam.length}`);
 
 const publishedPath = join(root, 'public/accuracy.json');
 const previous = existsSync(publishedPath) ? JSON.parse(readFileSync(publishedPath, 'utf8')) : null;
 if (previous && previous.total === report.total && correct < previous.correct && !force) {
   console.error(`Score dropped from ${previous.correct} to ${correct}. Not publishing. Fix the misses, or pass --force.`);
+  process.exit(1);
+}
+const prevSafety = previous?.safety;
+if (prevSafety && prevSafety.total === report.safety.total && safe < prevSafety.passed && !force) {
+  console.error(`Safety score dropped from ${prevSafety.passed} to ${safe}. Not publishing. Fix the misses, or pass --force.`);
   process.exit(1);
 }
 writeFileSync(publishedPath, JSON.stringify(report, null, 2) + '\n');

@@ -21,7 +21,17 @@ describe('matchFight', () => {
     expect(matchFight(q)?.id).toBe(id);
   });
 
-  it.each(['what is the best pizza', 'how do I play chess', 'can I play a red 5 on a blue 5', ''])(
+  it.each([
+    'what is the best pizza',
+    'how do I play chess',
+    'can I play a red 5 on a blue 5',
+    '',
+    'Who will win the next election in India',
+    'Can I skip class tomorrow',
+    'How do I reverse a car',
+    'Is black better than white',
+    'What is the score in the cricket match',
+  ])(
     'returns null for "%s"',
     (q) => {
       expect(matchFight(q)).toBeNull();

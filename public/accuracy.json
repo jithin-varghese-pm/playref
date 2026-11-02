@@ -1,5 +1,5 @@
 {
-  "ranAt": "2026-11-02T17:13:49.540Z",
+  "ranAt": "2026-11-02T17:26:25.622Z",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
   "rulesVersion": "c3f9b3adccd5",
   "total": 55,
@@ -15,5 +15,10 @@
       "expected": "NO or RULE (rule R1)",
       "got": "HOUSE RULE (verdict HOUSE RULE)"
     }
-  ]
+  ],
+  "safety": {
+    "total": 21,
+    "passed": 21,
+    "misses": []
+  }
 }

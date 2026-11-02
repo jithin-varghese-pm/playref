@@ -1,5 +1,6 @@
 import { RULE_CARDS } from '../shared/generated/rules-data';
 import { normalize } from '../shared/normalize';
+import { containsAbuse, looksLikeLeak, stripLinks } from './abuse';
 import { VERDICTS, type Answer, type Verdict } from '../shared/types';
 
 const MAX_TEXT = 400;
@@ -48,6 +49,19 @@ export function notSure(question: string): Answer {
   };
 }
 
+export function offTopic(question: string): Answer {
+  return {
+    question,
+    verdict: 'NOT SURE',
+    label: 'UNO ONLY',
+    line: 'I only referee the UNO card game for now. More road-trip games are coming.',
+    rules: 'Ask me anything about Classic UNO.',
+    house: 'None common.',
+    cards: [],
+    source: 'ai',
+  };
+}
+
 function text(v: unknown): string | null {
   if (typeof v !== 'string') return null;
   const t = v.trim();
@@ -70,14 +84,19 @@ export function validateAiReply(raw: unknown, question: string): Answer {
   if (!body || typeof body !== 'object') return notSure(question);
   const r = body as Record<string, unknown>;
 
+  // The AI says the question is not about Classic UNO: answer like any other off-topic question.
+  if (r.on_topic === false) return offTopic(question);
+
   const verdict = r.verdict as Verdict;
   if (!VERDICTS.includes(verdict)) return notSure(question);
   if (verdict === 'NOT SURE') return notSure(question);
 
-  const line = text(r.line);
-  const rules = text(r.rules);
-  const house = text(r.house) ?? 'None common.';
+  // Read what the AI wrote, not just its shape: no links, no abuse, no leaked instructions or markup.
+  const line = text(r.line) && stripLinks(text(r.line)!);
+  const rules = text(r.rules) && stripLinks(text(r.rules)!);
+  const house = (text(r.house) && stripLinks(text(r.house)!)) || 'None common.';
   if (!line || !rules) return notSure(question);
+  if ([line, rules, house].some((t) => containsAbuse(t) || looksLikeLeak(t))) return notSure(question);
 
   if (!Array.isArray(r.cards) || r.cards.length === 0) return notSure(question);
   const ids = new Set(RULE_CARDS.map((c) => c.id));

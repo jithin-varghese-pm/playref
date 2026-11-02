@@ -3,6 +3,7 @@ import { matchFight } from '../shared/match';
 import { normalize } from '../shared/normalize';
 import { fightToAnswer } from '../shared/rules';
 import type { Answer, AskResponse } from '../shared/types';
+import { checkWithGuard } from './guard';
 import { buildAiInput } from './prompt';
 import { classifyScope, type Scope } from './scope';
 import type { Store } from './store';
@@ -29,9 +30,22 @@ export interface AskDeps {
   ai: AiRunner;
   store: Store;
   model: string;
+  /** Run Cloudflare's safety model (Llama Guard) before the main AI. On in production. */
+  guard?: boolean;
 }
 
-const SCOPE_ANSWERS: Record<Exclude<Scope, 'in'>, Omit<Answer, 'question'>> = {
+type Blocked = Exclude<Scope, 'in'> | 'unsafe';
+
+const SCOPE_ANSWERS: Record<Blocked, Omit<Answer, 'question'>> = {
+  unsafe: {
+    verdict: 'NOT SURE',
+    label: 'NOT HERE',
+    line: "That's not something I can help with. I only referee card-game rules.",
+    rules: 'Ask me about a rule from your game, like "Can I stack +2 on +2?"',
+    house: 'None common.',
+    cards: [],
+    source: 'scope',
+  },
   'other-version': {
     verdict: 'NOT SURE',
     label: 'CLASSIC ONLY',
@@ -70,7 +84,7 @@ const SCOPE_ANSWERS: Record<Exclude<Scope, 'in'>, Omit<Answer, 'question'>> = {
   },
 };
 
-function scopeAnswer(question: string, kind: Exclude<Scope, 'in'>): Answer {
+function scopeAnswer(question: string, kind: Blocked): Answer {
   return { question, ...SCOPE_ANSWERS[kind] };
 }
 
@@ -111,6 +125,11 @@ export async function askQuestion(input: AskInput, deps: AskDeps): Promise<AskRe
   // Step 3: the AI, with the whole rules file.
   let answer: Answer;
   try {
+    // Safety model first: anything it flags never reaches the main AI.
+    if (deps.guard) {
+      const verdict = await checkWithGuard(deps.ai, question);
+      if (verdict && !verdict.safe) return { status: 'ok', answer: scopeAnswer(question, 'unsafe'), feedbackKey: null };
+    }
     const raw = await deps.ai.run(deps.model, buildAiInput(question));
     answer = validateAiReply(raw, question);
   } catch (e) {

@@ -18,11 +18,13 @@ Questions about other UNO versions (No Mercy, Flip...) or other games are caught
 
 ## Guardrails
 
-- **Before any AI call:** abuse gets a FOUL! card, greetings and "are you a bot?" get a friendly intro, and questions about other UNO versions or other games get CLASSIC ONLY / UNO ONLY. None of these use AI quota.
-- **Prompt injection:** the player's text is fenced as data, and the model is told to ignore instructions inside it.
-- **Grounding:** the model may only use the rule cards, must reply in a fixed JSON shape, and must cite real rule cards. Anything else becomes NOT SURE.
-- **Limits:** 10 typed questions per person per hour, 300 characters per question, and the free daily AI allocation as a hard cap.
-- **Privacy:** IP addresses are only stored as one-way hashes, and usage numbers are daily totals with no per-person data.
+Five layers, each measured by a red-team test set (21 attacks and look-alikes, scored on the Accuracy page):
+
+1. **Before any AI call:** abuse (including spaced-out and stretched spellings) gets a FOUL! card, greetings get a friendly intro, and other UNO versions or other games are caught. Known fights only match questions that are clearly about a card game.
+2. **Safety model:** Cloudflare's Llama Guard 3 checks every question that would reach the main AI. Anything unsafe gets NOT HERE.
+3. **Prompt injection:** the player's text is fenced as data, and the model is told to ignore instructions inside it. The model also flags off-topic questions itself (UNO ONLY).
+4. **Reply checks:** the model must reply in a fixed JSON shape and cite real rule cards. Its text is checked too: links are removed, and abuse, leaked instructions or markup turn the answer into NOT SURE.
+5. **Limits and privacy:** 10 typed questions per person per hour, 300 characters per question, the free daily AI allocation as a hard cap, IP addresses only as one-way hashes, and usage counted as daily totals.
 
 ## How accurate is it?
 
@@ -40,7 +42,7 @@ People can report a bug or suggest an idea from any screen (and flag a specific 
 
 - React 18 + TypeScript + Vite
 - Cloudflare Pages + Pages Functions, Workers AI (free daily allocation), D1
-- Vitest (91 tests) and Testing Library
+- Vitest (119 tests) and Testing Library
 
 ```
 rules/            rule cards (source of truth) and known fights

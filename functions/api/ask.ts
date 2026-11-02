@@ -35,7 +35,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUnti
   const now = Date.now();
   const result = await askQuestion(
     { question, clientId: await clientIdFrom(ip, env.ID_SALT ?? 'playref'), now, evalMode },
-    { ai, store, model: env.AI_MODEL },
+    { ai, store, model: env.AI_MODEL, guard: true },
   );
   // Usage counter: how typed questions were handled. Test runs are not counted.
   if (!evalMode) waitUntil(countEvent(store, 'ask', askOutcome(result), now).catch(() => {}));

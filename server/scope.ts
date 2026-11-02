@@ -1,10 +1,7 @@
 import { normalize } from '../shared/normalize';
+import { containsAbuse } from './abuse';
 
 export type Scope = 'in' | 'other-version' | 'not-uno' | 'abuse' | 'chitchat';
-
-/** Abuse in English and common Indian slang. Matched as whole words (and word starts for the f-word family). */
-const ABUSE_STARTS = ['fuck', 'motherfuck', 'bitch', 'asshole', 'bastard', 'cunt', 'dickhead', 'chutiya', 'madarchod', 'behenchod', 'bhenchod', 'bhosdi'];
-const ABUSE_WORDS = ['shit', 'dick', 'slut', 'whore', 'wtf', 'stfu', 'gandu', 'randi', 'myre', 'myran', 'thendi', 'kunna', 'poori'];
 
 /** Greetings and questions about the bot itself: answered with a friendly intro, never sent to the AI. */
 const GREETING = /^(hi+|hello+|hey+|yo|hola|namaste|good (morning|afternoon|evening|night)|sup|whats up|wassup)( (there|playref|bro|da|machane|buddy|all))?$/;
@@ -31,8 +28,7 @@ function has(text: string, phrase: string): boolean {
  */
 export function classifyScope(question: string): Scope {
   const text = normalize(question);
-  const words = text.split(' ');
-  if (words.some((w) => ABUSE_WORDS.includes(w) || ABUSE_STARTS.some((s) => w.startsWith(s)))) return 'abuse';
+  if (containsAbuse(question)) return 'abuse';
   if (GREETING.test(text) || (ABOUT_BOT.test(text) && !UNO_WORDS.some((p) => has(text, p)))) return 'chitchat';
   if (OTHER_VERSIONS.some((p) => has(text, p))) return 'other-version';
   if (OTHER_GAMES.some((p) => has(text, p)) && !UNO_WORDS.some((p) => has(text, p))) return 'not-uno';
