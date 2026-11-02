@@ -1,0 +1,20 @@
+name = "playref"
+pages_build_output_dir = "./dist"
+compatibility_date = "2025-10-01"
+
+[ai]
+binding = "AI"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "playref"
+# Filled in after `npx wrangler d1 create playref` on Jithin's Cloudflare account.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[vars]
+AI_MODEL = "@cf/meta/llama-3.3-70b-instruct-fp8-fast"
+
+# Secrets (set with `npx wrangler pages secret put <NAME>`, never committed):
+#   EVAL_TOKEN  lets evals/run.mjs skip the rate limit and saved answers
+#   ID_SALT     salt for hashing IP addresses

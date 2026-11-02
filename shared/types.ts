@@ -32,6 +32,8 @@ export interface Answer {
   house: string;
   cards: string[];
   source: AnswerSource;
+  /** Replaces the verdict word on the card, e.g. "CLASSIC ONLY". */
+  label?: string;
 }
 
 export type AskResponse =
