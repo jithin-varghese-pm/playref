@@ -1,11 +1,33 @@
+import { LINKS } from '../lib/links';
+
 export function Footer({ showAccuracy = false }: { showAccuracy?: boolean }) {
   return (
     <footer className="footer">
       {showAccuracy && (
-        <a href="#/accuracy" className="footer-link">
-          How accurate is Playref?
-        </a>
+        <div className="footer-row">
+          <a href="#/about" className="footer-link">
+            How Playref was built
+          </a>
+          <a href="#/accuracy" className="footer-link">
+            How accurate is it?
+          </a>
+        </div>
       )}
+      <p className="credit">
+        Built by <strong>Jithin Varghese</strong>
+        <span aria-hidden="true"> · </span>
+        <a href={LINKS.portfolio} target="_blank" rel="noopener">
+          Portfolio
+        </a>
+        <span aria-hidden="true"> · </span>
+        <a href={LINKS.linkedin} target="_blank" rel="noopener">
+          LinkedIn
+        </a>
+        <span aria-hidden="true"> · </span>
+        <a href={LINKS.code} target="_blank" rel="noopener">
+          Code
+        </a>
+      </p>
       <p>Unofficial fan project. UNO is a trademark of Mattel. Not affiliated with or endorsed by Mattel.</p>
     </footer>
   );

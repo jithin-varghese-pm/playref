@@ -3,6 +3,7 @@ import { fightToAnswer } from '../shared/rules';
 import type { Answer } from '../shared/types';
 import { ask } from './lib/api';
 import { useMediaQuery } from './lib/useMediaQuery';
+import { About } from './screens/About';
 import { Accuracy } from './screens/Accuracy';
 import { EmptyPanel } from './screens/EmptyPanel';
 import { Home } from './screens/Home';
@@ -39,6 +40,7 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
   }, [screen.name, wide]);
 
   if (hash === '#/accuracy') return <Accuracy />;
+  if (hash === '#/about') return <About />;
 
   async function onAsk(question: string) {
     setNotice(null);

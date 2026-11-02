@@ -94,6 +94,22 @@ describe('App', () => {
     expect(screen.getByRole('button', { name: 'Can I finish on a power card?' })).toBeTruthy();
   });
 
+  it('credits Jithin with portfolio, LinkedIn and code links', () => {
+    render(<App minThinkMs={0} />);
+    expect(screen.getByRole('link', { name: 'LinkedIn' }).getAttribute('href')).toBe('https://www.linkedin.com/in/jithin-varghese-1b1a828a/');
+    expect(screen.getByRole('link', { name: 'Portfolio' }).getAttribute('href')).toBe('https://jithin-varghese-pm.github.io/');
+    expect(screen.getByRole('link', { name: 'Code' }).getAttribute('href')).toBe('https://github.com/jithin-varghese-pm/playref');
+    expect(screen.getByRole('link', { name: 'How Playref was built' }).getAttribute('href')).toBe('#/about');
+  });
+
+  it('shows the case study on #/about', async () => {
+    mockFetch({ status: 'error', message: 'unused' });
+    window.location.hash = '#/about';
+    render(<App minThinkMs={0} />);
+    expect(screen.getByRole('heading', { name: /referee for the fights/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: 'Connect on LinkedIn' })).toBeTruthy();
+  });
+
   it('Classic-only answers show their own label', async () => {
     mockFetch({
       status: 'ok',
