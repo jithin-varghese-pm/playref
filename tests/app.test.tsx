@@ -26,14 +26,17 @@ describe('App', () => {
     expect(screen.getByText(/UNO is a trademark of Mattel/)).toBeTruthy();
   });
 
-  it('a fight button shows its checked verdict without calling the server', () => {
+  it('a fight button shows its checked verdict without asking the server, and counts the tap', () => {
     const fetch = mockFetch({ status: 'error', message: 'should not be called' });
     render(<App minThinkMs={0} />);
     fireEvent.click(screen.getByRole('button', { name: 'Can I stack +2 on +2?' }));
     expect(screen.getByLabelText('Verdict').textContent).toContain('HOUSE');
     expect(screen.queryByText('Was this answer right?')).toBeNull();
     expect(screen.queryByText('AI answer from the Classic rules')).toBeNull();
-    expect(fetch).not.toHaveBeenCalled();
+    const calls = fetch.mock.calls as unknown as [string, RequestInit][];
+    expect(calls.some(([url]) => url === '/api/ask')).toBe(false);
+    const tap = calls.find(([url]) => url === '/api/event');
+    expect(JSON.parse(String(tap?.[1].body))).toEqual({ event: 'tap', key: 'stack-plus2' });
   });
 
   it('a typed question shows the AI verdict with the AI tag and feedback', async () => {

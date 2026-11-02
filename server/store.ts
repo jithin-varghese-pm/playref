@@ -21,6 +21,8 @@ export interface Store {
   /** Adds one "No" to a saved answer and returns the new count (0 if not saved). */
   addNo(key: string, version: string): Promise<number>;
   deleteSaved(key: string, version: string): Promise<void>;
+  /** Adds one to the daily total for an action (usage counter). */
+  bump(day: string, event: string, key: string): Promise<void>;
 }
 
 export class MemoryStore implements Store {
@@ -54,6 +56,11 @@ export class MemoryStore implements Store {
   }
   async deleteSaved(key: string, version: string) {
     this.saved.delete(`${version}|${key}`);
+  }
+  counts = new Map<string, number>();
+  async bump(day: string, event: string, key: string) {
+    const k = `${day}|${event}|${key}`;
+    this.counts.set(k, (this.counts.get(k) ?? 0) + 1);
   }
 }
 
@@ -111,5 +118,11 @@ export class D1Store implements Store {
   }
   async deleteSaved(key: string, version: string) {
     await this.db.prepare('DELETE FROM saved_answers WHERE q_key = ? AND rules_version = ?').bind(key, version).run();
+  }
+  async bump(day: string, event: string, key: string) {
+    await this.db
+      .prepare('INSERT INTO daily_counts (day, event, key, n) VALUES (?, ?, ?, 1) ON CONFLICT (day, event, key) DO UPDATE SET n = n + 1')
+      .bind(day, event, key)
+      .run();
   }
 }

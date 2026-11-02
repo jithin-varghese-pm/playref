@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { RULES_SHEET_URL, verdictWord } from '../../shared/rules';
 import type { Answer, Verdict } from '../../shared/types';
-import { sendFeedback } from '../lib/api';
+import { sendFeedback, track } from '../lib/api';
 import { shareVerdict } from '../lib/share';
 import { Footer } from './Footer';
 
@@ -30,11 +30,13 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
 
   async function vote(correct: boolean) {
     setVoted(true);
+    track('vote', correct ? 'yes' : 'no');
     if (feedbackKey) await sendFeedback(feedbackKey, answer, correct);
   }
 
   async function share() {
     const r = await shareVerdict(answer);
+    track('share', r);
     setShareMsg(r === 'copied' ? 'Verdict copied. Paste it in your group chat.' : r === 'failed' ? 'Could not share. Try a screenshot.' : null);
   }
 

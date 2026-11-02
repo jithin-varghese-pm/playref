@@ -13,6 +13,20 @@ export async function ask(question: string): Promise<AskResponse> {
   }
 }
 
+/** Usage counter: fire and forget, never blocks or breaks the app. */
+export function track(event: 'tap' | 'share' | 'page' | 'vote', key: string): void {
+  try {
+    void fetch('/api/event', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event, key }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    // ignore
+  }
+}
+
 export async function sendFeedback(feedbackKey: string, answer: Answer, correct: boolean): Promise<void> {
   try {
     await fetch('/api/feedback', {

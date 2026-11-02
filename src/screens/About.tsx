@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { track } from '../lib/api';
 import { LINKS } from '../lib/links';
 import type { AccuracyReport } from './Accuracy';
 import { Footer } from './Footer';
@@ -8,6 +9,7 @@ export function About() {
   const [score, setScore] = useState<AccuracyReport | null>(null);
 
   useEffect(() => {
+    track('page', 'about');
     fetch('/accuracy.json')
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => setScore(d && typeof d === 'object' && 'total' in d ? d : null))

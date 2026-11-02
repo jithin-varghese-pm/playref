@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { fightToAnswer } from '../shared/rules';
 import type { Answer } from '../shared/types';
-import { ask } from './lib/api';
+import { ask, track } from './lib/api';
 import { useMediaQuery } from './lib/useMediaQuery';
 import { About } from './screens/About';
 import { Accuracy } from './screens/Accuracy';
@@ -60,7 +60,10 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
     <Home
       aiOff={aiOff}
       notice={notice}
-      onPick={(f) => setScreen({ name: 'verdict', answer: fightToAnswer(f), feedbackKey: null })}
+      onPick={(f) => {
+        track('tap', f.id);
+        setScreen({ name: 'verdict', answer: fightToAnswer(f), feedbackKey: null });
+      }}
       onAsk={onAsk}
     />
   );

@@ -1,6 +1,7 @@
 import { askQuestion, type AiRunner } from '../../server/ask';
 import { clientIdFrom } from '../../server/client';
 import { D1Store, type D1Like } from '../../server/store';
+import { askOutcome, countEvent } from '../../server/usage';
 
 interface Env {
   AI: Ai;
@@ -12,7 +13,7 @@ interface Env {
   ID_SALT?: string;
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUntil }) => {
   let question = '';
   try {
     const body = (await request.json()) as { question?: unknown };
@@ -30,9 +31,13 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
     run: (model, input) => env.AI.run(model as Parameters<Ai['run']>[0], input as never),
   };
 
+  const store = new D1Store(env.DB as unknown as D1Like);
+  const now = Date.now();
   const result = await askQuestion(
-    { question, clientId: await clientIdFrom(ip, env.ID_SALT ?? 'playref'), now: Date.now(), evalMode },
-    { ai, store: new D1Store(env.DB as unknown as D1Like), model: env.AI_MODEL },
+    { question, clientId: await clientIdFrom(ip, env.ID_SALT ?? 'playref'), now, evalMode },
+    { ai, store, model: env.AI_MODEL },
   );
+  // Usage counter: how typed questions were handled. Test runs are not counted.
+  if (!evalMode) waitUntil(countEvent(store, 'ask', askOutcome(result), now).catch(() => {}));
   return Response.json(result, { headers: { 'Cache-Control': 'no-store' } });
 };

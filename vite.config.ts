@@ -41,6 +41,11 @@ function localApi(): Plugin {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(result));
       });
+      // Usage counter is a no-op locally, so local testing never pollutes the real numbers.
+      server.middlewares.use('/api/event', (_req, res) => {
+        res.statusCode = 204;
+        res.end();
+      });
       server.middlewares.use('/api/feedback', async (req, res) => {
         const b = await readJson(req);
         if (typeof b.feedbackKey === 'string' && typeof b.correct === 'boolean' && b.answer) {

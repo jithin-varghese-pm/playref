@@ -22,6 +22,10 @@ Questions about other UNO versions (No Mercy, Flip...) or other games are caught
 
 Players can also mark AI answers right or wrong. Three "No" votes remove a saved answer and send it for review.
 
+## Measuring use
+
+Cloudflare Web Analytics counts visitors (no cookies). A small usage counter in D1 keeps daily totals of in-app actions (fight taps, how typed questions were answered, shares, votes), never who did them. `npm run usage` prints the summary.
+
 ## Stack
 
 - React 18 + TypeScript + Vite

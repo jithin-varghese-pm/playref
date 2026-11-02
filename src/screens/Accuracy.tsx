@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { track } from '../lib/api';
 import { Footer } from './Footer';
 
 export interface AccuracyReport {
@@ -14,6 +15,7 @@ export function Accuracy() {
   const [report, setReport] = useState<AccuracyReport | null | 'none'>(null);
 
   useEffect(() => {
+    track('page', 'accuracy');
     fetch('/accuracy.json')
       .then((r) => (r.ok ? r.json() : 'none'))
       .then((d: AccuracyReport | 'none') => setReport(d && typeof d === 'object' && 'total' in d ? d : 'none'))

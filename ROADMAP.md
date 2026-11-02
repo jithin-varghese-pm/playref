@@ -10,7 +10,7 @@ Goal: real people use it, and we measure it honestly.
    - ~~Swap the UNO-style colours for Playref's own palette~~ Done 2 Nov 2026: MBM black, yellow and cream.
    - Jithin reads all 18 rule cards against Mattel's Classic sheet (GDJ85).
    - India trademark search for "playref" (IP India, needs Jithin's OTP login).
-   - Privacy-friendly visitor stats (GoatCounter, no cookies).
+   - ~~Visitor stats~~ Done 2 Nov 2026: Cloudflare Web Analytics (visitors) + Playref usage counter (`npm run usage`).
    - Cloudflare token in GitHub, so every push deploys on its own.
 2. **Real users**
    - 20 to 30 people: road-trip friend groups, one MBM story, LinkedIn.

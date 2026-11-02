@@ -10,7 +10,8 @@
     "preview:cf": "npm run build && wrangler pages dev dist",
     "test": "npm run rules && vitest run",
     "typecheck": "npm run rules && tsc -b",
-    "eval": "node evals/run.mjs"
+    "eval": "node evals/run.mjs",
+    "usage": "node scripts/usage.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
