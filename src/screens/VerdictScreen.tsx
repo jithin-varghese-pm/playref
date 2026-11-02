@@ -6,11 +6,11 @@ import { shareVerdict } from '../lib/share';
 import { Footer } from './Footer';
 
 const CARD_STYLE: Record<Verdict, { bg: string; fg: string }> = {
-  YES: { bg: '#7ED957', fg: '#1A1A1A' },
-  NO: { bg: '#FFFFFF', fg: '#C8102E' },
-  'HOUSE RULE': { bg: '#FFD100', fg: '#1A1A1A' },
-  RULE: { bg: '#8FD3FF', fg: '#1A1A1A' },
-  'NOT SURE': { bg: '#E6E6E6', fg: '#1A1A1A' },
+  YES: { bg: '#8EE07F', fg: '#141414' },
+  NO: { bg: '#FF6B5B', fg: '#141414' },
+  'HOUSE RULE': { bg: '#F5E642', fg: '#141414' },
+  RULE: { bg: '#8FD3FF', fg: '#141414' },
+  'NOT SURE': { bg: '#D9D4C3', fg: '#141414' },
 };
 
 interface Props {

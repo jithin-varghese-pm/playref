@@ -63,6 +63,8 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 - 2 Nov 2026: **Build and ship (Part 3) approved:** React + TypeScript + Vite, **Cloudflare** (chosen over Vercel: free AI in the same account, daily reset, no 30-day lock-out), D1 for storage (not KV), repo `jithin-varghese-pm/playref`, auto-deploy to playref.pages.dev.
 - Full design: `docs/superpowers/specs/2026-11-02-playref-v1-design.md`.
 
+- 2 Nov 2026: **Colours: MBM black, yellow and cream** replace the UNO-style red (trademark rule cleared). Verdict cards: YES green, NO coral, HOUSE RULE MBM yellow, THE RULE light blue, NOT SURE grey, all with dark text.
+
 ## Open decisions
 
 - Review of the design document.
