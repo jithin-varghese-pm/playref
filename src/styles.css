@@ -118,6 +118,42 @@ button { font: inherit; }
 .misses { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
 .misses li { display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.45; }
 
+/* Laptop: split screen. Breakpoint must match WIDE_QUERY in App.tsx. */
+.empty-panel { align-items: center; justify-content: center; gap: 28px; }
+.face-down { width: 250px; height: 330px; border-radius: 20px; background: var(--paper); padding: 10px; box-shadow: 0 14px 30px rgba(0, 0, 0, 0.32); transform: rotate(-4deg); }
+.face-down-inner {
+  height: 100%; border-radius: 14px; background: var(--ink); color: var(--sun);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--display); font-weight: 800; font-style: italic; font-size: 120px;
+}
+.empty-text { margin: 0; max-width: 300px; text-align: center; font-size: 16px; line-height: 1.5; color: var(--soft); }
+
+@media (min-width: 900px) {
+  .desk {
+    display: grid;
+    grid-template-columns: minmax(400px, 500px) minmax(0, 1fr);
+    gap: 56px;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 40px;
+    align-items: start;
+  }
+  .desk .screen { max-width: none; margin: 0; }
+  .desk .home { padding-top: 40px; }
+  .desk .fight-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .desk .fight { min-height: 72px; align-items: center; }
+  .desk .fights h1 { font-size: 40px; }
+  .desk .wordmark { font-size: 44px; }
+  .panel-wrap { position: sticky; top: 0; height: 100svh; display: flex; }
+  .panel { flex: 1; min-height: 0; max-width: 560px; margin: 0 auto; padding-top: 48px; overflow-y: auto; }
+  .panel .verdict-card { width: 290px; min-height: 370px; }
+  .panel .verdict-inner { min-height: 350px; }
+  .panel .verdict-word { font-size: 88px; }
+  .panel .verdict-line { font-size: 16px; }
+  .panel .verdict-q { font-size: 20px; }
+  .panel .actions { margin-top: 8px; }
+}
+
 /* Motion */
 .tap { transition: transform 0.14s ease, box-shadow 0.14s ease; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22); }
 @media (hover: hover) { .tap:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 7px 0 rgba(0, 0, 0, 0.22); } }

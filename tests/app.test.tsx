@@ -70,6 +70,30 @@ describe('App', () => {
     await waitFor(() => expect(screen.getByText(/asked a lot this hour/)).toBeTruthy());
   });
 
+  it('on a laptop, fights and the verdict show side by side', () => {
+    vi.stubGlobal('matchMedia', (q: string) => ({
+      matches: q.includes('min-width: 900px'),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }));
+    render(<App minThinkMs={0} />);
+    expect(screen.getByText(/The verdict lands here/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Can I stack +2 on +2?' }));
+    expect(screen.getByLabelText('Verdict').textContent).toContain('HOUSE');
+    // The fights are still on screen, so a second fight replaces the verdict in place.
+    fireEvent.click(screen.getByRole('button', { name: 'Can I finish on a power card?' }));
+    expect(screen.getByLabelText('Verdict').textContent).toContain('YES');
+    expect(screen.queryByRole('button', { name: 'Back to fights' })).toBeNull();
+  });
+
+  it('on a phone, a verdict replaces the fights and has a back button', () => {
+    render(<App minThinkMs={0} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Can I stack +2 on +2?' }));
+    expect(screen.queryByRole('button', { name: 'Can I finish on a power card?' })).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Back to fights' }));
+    expect(screen.getByRole('button', { name: 'Can I finish on a power card?' })).toBeTruthy();
+  });
+
   it('Classic-only answers show their own label', async () => {
     mockFetch({
       status: 'ok',

@@ -17,9 +17,12 @@ interface Props {
   answer: Answer;
   feedbackKey: string | null;
   onBack: () => void;
+  /** Laptop split screen: shown beside the fights, so no back button or footer. */
+  embedded?: boolean;
 }
 
-export function VerdictScreen({ answer, feedbackKey, onBack }: Props) {
+export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }: Props) {
+  const Tag = embedded ? 'section' : 'main';
   const [voted, setVoted] = useState(false);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
   const style = CARD_STYLE[answer.verdict];
@@ -36,13 +39,15 @@ export function VerdictScreen({ answer, feedbackKey, onBack }: Props) {
   }
 
   return (
-    <main className="screen verdict">
+    <Tag className={`screen verdict${embedded ? ' panel' : ''}`}>
       <nav className="verdict-nav">
-        <button type="button" className="back tap" aria-label="Back to fights" onClick={onBack}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M15 6l-6 6 6 6" />
-          </svg>
-        </button>
+        {!embedded && (
+          <button type="button" className="back tap" aria-label="Back to fights" onClick={onBack}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M15 6l-6 6 6 6" />
+            </svg>
+          </button>
+        )}
         <div className="verdict-q">{answer.question}</div>
       </nav>
 
@@ -107,8 +112,8 @@ export function VerdictScreen({ answer, feedbackKey, onBack }: Props) {
             {shareMsg}
           </p>
         )}
-        <Footer />
+        {!embedded && <Footer />}
       </div>
-    </main>
+    </Tag>
   );
 }

@@ -2,12 +2,17 @@ import { useEffect, useState } from 'react';
 import { fightToAnswer } from '../shared/rules';
 import type { Answer } from '../shared/types';
 import { ask } from './lib/api';
+import { useMediaQuery } from './lib/useMediaQuery';
 import { Accuracy } from './screens/Accuracy';
+import { EmptyPanel } from './screens/EmptyPanel';
 import { Home } from './screens/Home';
 import { Thinking } from './screens/Thinking';
 import { VerdictScreen } from './screens/VerdictScreen';
 
 type Screen = { name: 'home' } | { name: 'thinking' } | { name: 'verdict'; answer: Answer; feedbackKey: string | null };
+
+/** Laptop and wide tablet screens get the split layout. Must match the CSS breakpoint. */
+export const WIDE_QUERY = '(min-width: 900px)';
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -27,10 +32,11 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
   const [aiOff, setAiOff] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const hash = useHashRoute();
+  const wide = useMediaQuery(WIDE_QUERY);
 
   useEffect(() => {
-    window.scrollTo?.(0, 0);
-  }, [screen.name]);
+    if (!wide) window.scrollTo?.(0, 0);
+  }, [screen.name, wide]);
 
   if (hash === '#/accuracy') return <Accuracy />;
 
@@ -48,10 +54,7 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
     setScreen({ name: 'home' });
   }
 
-  if (screen.name === 'thinking') return <Thinking />;
-  if (screen.name === 'verdict')
-    return <VerdictScreen answer={screen.answer} feedbackKey={screen.feedbackKey} onBack={() => setScreen({ name: 'home' })} />;
-  return (
+  const home = (
     <Home
       aiOff={aiOff}
       notice={notice}
@@ -59,4 +62,35 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
       onAsk={onAsk}
     />
   );
+  const goHome = () => {
+    setScreen({ name: 'home' });
+    if (wide) document.getElementById('ask-input')?.focus();
+  };
+
+  // Laptop: fights on the left, the verdict lands on the right without leaving the page.
+  if (wide) {
+    return (
+      <div className="desk">
+        {home}
+        <div className="panel-wrap" aria-live="polite">
+          {screen.name === 'thinking' && <Thinking embedded />}
+          {screen.name === 'verdict' && (
+            <VerdictScreen
+              key={`${screen.answer.question}|${screen.answer.verdict}`}
+              embedded
+              answer={screen.answer}
+              feedbackKey={screen.feedbackKey}
+              onBack={goHome}
+            />
+          )}
+          {screen.name === 'home' && <EmptyPanel />}
+        </div>
+      </div>
+    );
+  }
+
+  // Phone: one screen at a time.
+  if (screen.name === 'thinking') return <Thinking />;
+  if (screen.name === 'verdict') return <VerdictScreen answer={screen.answer} feedbackKey={screen.feedbackKey} onBack={goHome} />;
+  return home;
 }

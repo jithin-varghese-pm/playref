@@ -1,6 +1,7 @@
-export function Thinking() {
+export function Thinking({ embedded = false }: { embedded?: boolean }) {
+  const Tag = embedded ? 'section' : 'main';
   return (
-    <main className="screen thinking">
+    <Tag className={`screen thinking${embedded ? ' panel' : ''}`}>
       <div className="shuffle" aria-hidden="true">
         <div className="shuffle-card sl" style={{ background: '#0067B1' }} />
         <div className="shuffle-card sr" style={{ background: '#00A651' }} />
@@ -16,6 +17,6 @@ export function Thinking() {
         </div>
         <div className="sub">Reading the Classic rules for you</div>
       </div>
-    </main>
+    </Tag>
   );
 }
