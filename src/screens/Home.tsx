@@ -3,6 +3,8 @@ import { buttonFights } from '../../shared/rules';
 import type { Fight } from '../../shared/types';
 import { Footer } from './Footer';
 
+const DOTS = ['#C8102E', '#0067B1', '#00A651', '#FFD100'];
+
 interface Props {
   aiOff: boolean;
   notice: string | null;
@@ -44,9 +46,9 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
       <section className="fights">
         <h1 className="display">What's the fight?</h1>
         <div className="fight-list">
-          {buttonFights.map((f) => (
+          {buttonFights.map((f, i) => (
             <button key={f.id} type="button" className="fight tap" onClick={() => onPick(f)}>
-              <span className="dot" aria-hidden="true" />
+              <span className="dot" aria-hidden="true" style={{ background: DOTS[i % DOTS.length] }} />
               {f.question}
             </button>
           ))}

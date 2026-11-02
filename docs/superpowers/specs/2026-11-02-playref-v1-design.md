@@ -35,7 +35,7 @@ It is a free fan project, made to show both AI product skills (answers tied to a
 4. **Honest over confident.** When the AI cannot back its answer with a real rule card, the user sees NOT SURE, not a guess.
 5. **Free stays free.** No paid plan, no card on file. When a free limit is reached, the feature rests until the next day.
 5a. **AI is the last step, not the first.** A typed question reaches the AI only when it matches no known fight and has no saved answer. Mattel's rules sheet may be downloaded and kept locally as a private reference for checking rule cards, but its text is never shipped in the app.
-6. **Colours.** MBM black, yellow and cream (since 2 Nov 2026). No UNO colour scheme.
+6. **Colours.** Option A uses UNO-style colours for exploring only. Before a public launch, swap to Playref's own colours.
 7. **Personal identity.** The repo lives on the personal GitHub account `jithin-varghese-pm`, with the personal git name and email set for this repo only. Never the work account.
 
 ## 3. Interface

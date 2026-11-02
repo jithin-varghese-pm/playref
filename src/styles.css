@@ -1,17 +1,16 @@
-/* Playref look: Option A layout and motion, in MBM black, yellow and cream
-   (chosen 2 Nov 2026 to replace the UNO-style red). */
+/* Playref, Option A "Red table".
+   The UNO-style colours are for exploring only. Swap --table and friends for
+   Playref's own palette before a public launch (see docs/superpowers/specs). */
 :root {
-  --table: #000000;
-  --ink: #141414;
-  --paper: #f3efe0;
-  --sun: #f5e642;
-  --sun-hover: #faf08a;
-  --soft: #cfc9b4;
-  --raise: rgba(245, 230, 66, 0.28);
-  --well: rgba(243, 239, 224, 0.08);
+  --table: #c8102e;
+  --ink: #1a1a1a;
+  --paper: #ffffff;
+  --sun: #ffd100;
+  --sun-hover: #ffe04d;
+  --soft: #ffe3e6;
   --display: 'Barlow Condensed', 'Arial Narrow', sans-serif;
   --body: Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -54,7 +53,7 @@ button { font: inherit; }
   border: 0; border-radius: 12px; background: var(--paper); color: var(--ink);
   font-size: 15px; font-weight: 600; text-align: left; cursor: pointer;
 }
-.dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: var(--sun); box-shadow: inset 0 0 0 2px var(--ink); }
+.dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
 
 .ask { display: flex; flex-direction: column; gap: 8px; }
 .ask label { font-size: 13px; font-weight: 600; color: var(--soft); }
@@ -64,11 +63,10 @@ button { font: inherit; }
   background: var(--paper); color: var(--ink); font: 400 16px var(--body);
 }
 .ask input::placeholder { color: #6b6b6b; }
-.ask input:disabled { background: #2a2a26; color: #b9b3a0; }
-.ask input:disabled::placeholder { color: #b9b3a0; }
+.ask input:disabled { background: #f1d2d6; color: #5a5a5a; }
 .ask-btn { height: 52px; padding: 0 20px; border: 0; border-radius: 12px; background: var(--sun); color: var(--ink); font-weight: 700; font-size: 15px; cursor: pointer; }
-.ask-btn:disabled { background: #3a3a34; color: #b9b3a0; cursor: not-allowed; box-shadow: none; }
-.notice { margin: 0; font-size: 14px; line-height: 1.45; color: var(--paper); background: var(--well); padding: 10px 12px; border-radius: 10px; }
+.ask-btn:disabled { background: #e8c9cd; color: #5a5a5a; cursor: not-allowed; box-shadow: none; }
+.notice { margin: 0; font-size: 14px; line-height: 1.45; color: var(--paper); background: rgba(0, 0, 0, 0.22); padding: 10px 12px; border-radius: 10px; }
 
 .footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; font-size: 11px; line-height: 1.5; color: var(--soft); }
 .footer p { margin: 0; }
@@ -128,7 +126,7 @@ a.cta-btn, a.cta-btn:hover { color: var(--ink); }
 .detail h2 { margin: 0; font-size: 14px; font-weight: 700; color: var(--sun); }
 .detail p, .detail-p { margin: 0; font-size: 15px; line-height: 1.5; }
 .detail a { font-size: 14px; font-weight: 600; }
-.feedback { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 12px; background: var(--well); font-size: 14px; min-height: 64px; }
+.feedback { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 14px; border-radius: 12px; background: rgba(0, 0, 0, 0.22); font-size: 14px; min-height: 64px; }
 .feedback-btns { display: flex; gap: 8px; }
 .feedback-btns button { min-width: 56px; height: 44px; border: 0; border-radius: 10px; background: var(--paper); color: var(--ink); font-weight: 600; cursor: pointer; }
 .actions { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
@@ -183,9 +181,9 @@ a.cta-btn, a.cta-btn:hover { color: var(--ink); }
 }
 
 /* Motion */
-.tap { transition: transform 0.14s ease, box-shadow 0.14s ease; box-shadow: 0 3px 0 var(--raise); }
-@media (hover: hover) { .tap:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 7px 0 var(--raise); } }
-.tap:active:not(:disabled) { transform: translateY(2px) scale(0.98); box-shadow: 0 0 0 var(--raise); }
+.tap { transition: transform 0.14s ease, box-shadow 0.14s ease; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.22); }
+@media (hover: hover) { .tap:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 7px 0 rgba(0, 0, 0, 0.22); } }
+.tap:active:not(:disabled) { transform: translateY(2px) scale(0.98); box-shadow: 0 0 0 rgba(0, 0, 0, 0.22); }
 
 @keyframes flip-in {
   0% { transform: perspective(900px) rotateY(180deg) rotate(-4deg) scale(0.55); opacity: 0; }

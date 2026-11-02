@@ -7,7 +7,7 @@ Last updated: 2 Nov 2026. Decisions and their reasons live in `PROJECT-NOTES.md`
 Goal: real people use it, and we measure it honestly.
 
 1. **Safe to share**
-   - ~~Swap the UNO-style colours for Playref's own palette~~ Done 2 Nov 2026: MBM black, yellow and cream.
+   - Swap the UNO-style colours for Playref's own palette (trademark rule).
    - Jithin reads all 18 rule cards against Mattel's Classic sheet (GDJ85).
    - India trademark search for "playref" (IP India, needs Jithin's OTP login).
    - ~~Visitor stats~~ Done 2 Nov 2026: Cloudflare Web Analytics (visitors) + Playref usage counter (`npm run usage`).
