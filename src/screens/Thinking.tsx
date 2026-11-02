@@ -15,7 +15,7 @@ export function Thinking({ embedded = false }: { embedded?: boolean }) {
           <span className="dot2">.</span>
           <span className="dot3">.</span>
         </div>
-        <div className="sub">Reading the Classic rules for you</div>
+        <div className="sub">The AI referee is reading the Classic rules</div>
       </div>
     </Tag>
   );

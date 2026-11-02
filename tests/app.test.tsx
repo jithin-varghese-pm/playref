@@ -32,7 +32,7 @@ describe('App', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Can I stack +2 on +2?' }));
     expect(screen.getByLabelText('Verdict').textContent).toContain('HOUSE');
     expect(screen.queryByText('Was this answer right?')).toBeNull();
-    expect(screen.queryByText('AI answer from the Classic rules')).toBeNull();
+    expect(screen.queryByText('AI referee answer')).toBeNull();
     const calls = fetch.mock.calls as unknown as [string, RequestInit][];
     expect(calls.some(([url]) => url === '/api/ask')).toBe(false);
     const tap = calls.find(([url]) => url === '/api/event');
@@ -46,10 +46,11 @@ describe('App', () => {
       answer: { question: 'who shuffles', verdict: 'RULE', line: 'The dealer shuffles.', rules: 'R2 says so.', house: 'None common.', cards: ['R2'], source: 'ai' },
     });
     render(<App minThinkMs={0} />);
-    fireEvent.change(screen.getByLabelText('Or type your own'), { target: { value: 'who shuffles' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Ask' }));
+    fireEvent.change(screen.getByLabelText(/Describe it in your own words/), { target: { value: 'who shuffles' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Ask the referee' }));
     await waitFor(() => expect(screen.getByLabelText('Verdict').textContent).toContain('THE'));
-    expect(screen.getByText('AI answer from the Classic rules')).toBeTruthy();
+    expect(screen.getByText('AI referee answer')).toBeTruthy();
+    expect(screen.getByText('R2 · Setting up')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Yes' }));
     await waitFor(() => expect(screen.getByText('Thanks, noted.')).toBeTruthy());
   });
@@ -57,10 +58,10 @@ describe('App', () => {
   it('when the free AI is used up, the type box rests and buttons still work', async () => {
     mockFetch({ status: 'ai_off' });
     render(<App minThinkMs={0} />);
-    fireEvent.change(screen.getByLabelText('Or type your own'), { target: { value: 'something new' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Ask' }));
+    fireEvent.change(screen.getByLabelText(/Describe it in your own words/), { target: { value: 'something new' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Ask the referee' }));
     await waitFor(() => expect(screen.getByText(/Typed questions are back tomorrow/)).toBeTruthy());
-    expect((screen.getByLabelText('Or type your own') as HTMLInputElement).disabled).toBe(true);
+    expect((screen.getByLabelText(/Describe it in your own words/) as HTMLTextAreaElement).disabled).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Can I finish on a power card?' }));
     expect(screen.getByLabelText('Verdict').textContent).toContain('YES');
   });
@@ -68,8 +69,8 @@ describe('App', () => {
   it('shows the rate-limit message', async () => {
     mockFetch({ status: 'rate_limited' });
     render(<App minThinkMs={0} />);
-    fireEvent.change(screen.getByLabelText('Or type your own'), { target: { value: 'something new' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Ask' }));
+    fireEvent.change(screen.getByLabelText(/Describe it in your own words/), { target: { value: 'something new' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Ask the referee' }));
     await waitFor(() => expect(screen.getByText(/asked a lot this hour/)).toBeTruthy());
   });
 
@@ -120,8 +121,8 @@ describe('App', () => {
       answer: { question: 'uno flip', verdict: 'NOT SURE', label: 'CLASSIC ONLY', line: 'Classic only for now.', rules: 'x', house: 'None common.', cards: [], source: 'scope' },
     });
     render(<App minThinkMs={0} />);
-    fireEvent.change(screen.getByLabelText('Or type your own'), { target: { value: 'uno flip' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Ask' }));
+    fireEvent.change(screen.getByLabelText(/Describe it in your own words/), { target: { value: 'uno flip' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Ask the referee' }));
     await waitFor(() => expect(screen.getByLabelText('Verdict').textContent).toContain('CLASSIC'));
   });
 });

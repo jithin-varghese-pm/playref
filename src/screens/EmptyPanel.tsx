@@ -7,7 +7,7 @@ export function EmptyPanel() {
           <div className="face-down-inner">?</div>
         </div>
       </div>
-      <p className="empty-text">Pick a fight on the left, or type your own. The verdict lands here.</p>
+      <p className="empty-text">Ask the AI referee on the left, or tap a common fight. The verdict lands here.</p>
     </section>
   );
 }

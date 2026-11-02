@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { RULE_CARDS } from '../../shared/generated/rules-data';
 import { RULES_SHEET_URL, verdictWord } from '../../shared/rules';
+import { SparkIcon } from './Home';
 import type { Answer, Verdict } from '../../shared/types';
 import { sendFeedback, track } from '../lib/api';
 import { shareVerdict } from '../lib/share';
@@ -27,6 +29,7 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
   const [shareMsg, setShareMsg] = useState<string | null>(null);
   const style = CARD_STYLE[answer.verdict];
   const fromAi = answer.source === 'ai' || answer.source === 'saved';
+  const usedCards = RULE_CARDS.filter((c) => answer.cards.includes(c.id));
 
   async function vote(correct: boolean) {
     setVoted(true);
@@ -53,21 +56,37 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
         <div className="verdict-q">{answer.question}</div>
       </nav>
 
+      {fromAi && (
+        <div className="ai-ribbon">
+          <SparkIcon />
+          <span>
+            <strong>AI referee answer</strong>, checked against {usedCards.length} rule card{usedCards.length === 1 ? '' : 's'}
+          </span>
+        </div>
+      )}
+
       <div className="card-stage">
         <section className="verdict-card flip" aria-label="Verdict">
           <div className="verdict-inner" style={{ background: style.bg, color: style.fg }}>
-            <div className="verdict-label">VERDICT</div>
+            <div className="verdict-label">{fromAi ? 'AI VERDICT' : 'VERDICT'}</div>
             <div className="verdict-word">{verdictWord(answer)}</div>
             <div className="verdict-line">{answer.line}</div>
           </div>
         </section>
       </div>
 
-      {fromAi && <div className="ai-tag up1">AI answer from the Classic rules</div>}
-
       <section className="detail up1">
         <h2>What the rules say</h2>
         <p>{answer.rules}</p>
+        {usedCards.length > 0 && (
+          <ul className="rule-chips" aria-label="Rules used">
+            {usedCards.map((c) => (
+              <li key={c.id}>
+                {c.id} · {c.title}
+              </li>
+            ))}
+          </ul>
+        )}
         <a href={RULES_SHEET_URL} target="_blank" rel="noreferrer">
           Read Mattel's rules sheet
         </a>
