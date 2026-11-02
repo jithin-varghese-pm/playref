@@ -28,7 +28,9 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
   const Tag = embedded ? 'section' : 'main';
   const [voted, setVoted] = useState(false);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
-  const style = CARD_STYLE[answer.verdict];
+  // A FOUL! gets a referee's yellow card; a HELLO! gets a friendly blue one.
+  const style =
+    answer.label === 'FOUL!' ? CARD_STYLE['HOUSE RULE'] : answer.label === 'HELLO!' ? CARD_STYLE.RULE : CARD_STYLE[answer.verdict];
   const fromAi = answer.source === 'ai' || answer.source === 'saved';
   const usedCards = RULE_CARDS.filter((c) => answer.cards.includes(c.id));
 

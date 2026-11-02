@@ -64,6 +64,16 @@ describe('classifyScope', () => {
     ['best poker hand', 'not-uno'],
     ['can I stack +2', 'in'],
     ['what if the first card flipped over is a skip', 'in'],
+    ['hi are you a fucker', 'abuse'],
+    ['this app is shit', 'abuse'],
+    ['WTF', 'abuse'],
+    ['hi', 'chitchat'],
+    ['Hello there!', 'chitchat'],
+    ['are you a bot?', 'chitchat'],
+    ['who made you', 'chitchat'],
+    ['who goes first', 'in'],
+    ['are you sure I can play a wild card any time', 'in'],
+    ['can I skip the dickens bit', 'in'],
   ])('"%s" is %s', (q, scope) => {
     expect(classifyScope(q)).toBe(scope);
   });
@@ -160,6 +170,16 @@ describe('askQuestion', () => {
     const ai = fakeAi();
     const r = await askQuestion({ ...base, question: 'how do you castle in chess' }, { ai, store: new MemoryStore(), model: 'm' });
     expect(r.status === 'ok' && r.answer.label).toBe('UNO ONLY');
+    expect(ai.run).not.toHaveBeenCalled();
+  });
+
+  it('answers abuse with a FOUL card and greetings with an intro, both without AI', async () => {
+    const ai = fakeAi();
+    const deps = { ai, store: new MemoryStore(), model: 'm' };
+    const foul = await askQuestion({ ...base, question: 'hi are you a fucker' }, deps);
+    expect(foul.status === 'ok' && foul.answer.label).toBe('FOUL!');
+    const hello = await askQuestion({ ...base, question: 'hello' }, deps);
+    expect(hello.status === 'ok' && hello.answer.label).toBe('HELLO!');
     expect(ai.run).not.toHaveBeenCalled();
   });
 

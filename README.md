@@ -16,6 +16,14 @@ Playref treats AI as the last step, not the first.
 
 Questions about other UNO versions (No Mercy, Flip...) or other games are caught before any AI call.
 
+## Guardrails
+
+- **Before any AI call:** abuse gets a FOUL! card, greetings and "are you a bot?" get a friendly intro, and questions about other UNO versions or other games get CLASSIC ONLY / UNO ONLY. None of these use AI quota.
+- **Prompt injection:** the player's text is fenced as data, and the model is told to ignore instructions inside it.
+- **Grounding:** the model may only use the rule cards, must reply in a fixed JSON shape, and must cite real rule cards. Anything else becomes NOT SURE.
+- **Limits:** 10 typed questions per person per hour, 300 characters per question, and the free daily AI allocation as a hard cap.
+- **Privacy:** IP addresses are only stored as one-way hashes, and usage numbers are daily totals with no per-person data.
+
 ## How accurate is it?
 
 `evals/questions.json` holds 50 tricky questions with known right answers, checked against Mattel's Classic rules sheet. `npm run eval` scores the live app and publishes the result to the in-app Accuracy page, including every miss. A release stops if the score drops. First live run (2 Nov 2026): 48 of 50, with 41 answered without any AI call.
@@ -32,7 +40,7 @@ People can report a bug or suggest an idea from any screen (and flag a specific 
 
 - React 18 + TypeScript + Vite
 - Cloudflare Pages + Pages Functions, Workers AI (free daily allocation), D1
-- Vitest (79 tests) and Testing Library
+- Vitest (91 tests) and Testing Library
 
 ```
 rules/            rule cards (source of truth) and known fights

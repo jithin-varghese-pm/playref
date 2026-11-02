@@ -4,7 +4,7 @@ import { normalize } from '../shared/normalize';
 import { fightToAnswer } from '../shared/rules';
 import type { Answer, AskResponse } from '../shared/types';
 import { buildAiInput } from './prompt';
-import { classifyScope } from './scope';
+import { classifyScope, type Scope } from './scope';
 import type { Store } from './store';
 import { notSure, validateAiReply } from './validate';
 
@@ -31,28 +31,47 @@ export interface AskDeps {
   model: string;
 }
 
-function scopeAnswer(question: string, kind: 'other-version' | 'not-uno'): Answer {
-  return kind === 'other-version'
-    ? {
-        question,
-        verdict: 'NOT SURE',
-        label: 'CLASSIC ONLY',
-        line: 'Playref covers Classic UNO only for now.',
-        rules: 'Other versions like No Mercy and Flip have their own cards and rules. Check the rules sheet in that box.',
-        house: 'None common.',
-        cards: [],
-        source: 'scope',
-      }
-    : {
-        question,
-        verdict: 'NOT SURE',
-        label: 'UNO ONLY',
-        line: 'I only referee the UNO card game for now. More road-trip games are coming.',
-        rules: 'Ask me anything about Classic UNO.',
-        house: 'None common.',
-        cards: [],
-        source: 'scope',
-      };
+const SCOPE_ANSWERS: Record<Exclude<Scope, 'in'>, Omit<Answer, 'question'>> = {
+  'other-version': {
+    verdict: 'NOT SURE',
+    label: 'CLASSIC ONLY',
+    line: 'Playref covers Classic UNO only for now.',
+    rules: 'Other versions like No Mercy and Flip have their own cards and rules. Check the rules sheet in that box.',
+    house: 'None common.',
+    cards: [],
+    source: 'scope',
+  },
+  'not-uno': {
+    verdict: 'NOT SURE',
+    label: 'UNO ONLY',
+    line: 'I only referee the UNO card game for now. More road-trip games are coming.',
+    rules: 'Ask me anything about Classic UNO.',
+    house: 'None common.',
+    cards: [],
+    source: 'scope',
+  },
+  abuse: {
+    verdict: 'NOT SURE',
+    label: 'FOUL!',
+    line: "Let's keep it friendly. I only referee card-game rules.",
+    rules: 'Ask me about a rule, like "Can I stack +2 on +2?" or "Can I play a +4 when I have the colour?"',
+    house: 'None common.',
+    cards: [],
+    source: 'scope',
+  },
+  chitchat: {
+    verdict: 'NOT SURE',
+    label: 'HELLO!',
+    line: "Hi! I'm Playref, an unofficial rules referee for UNO, built by Jithin Varghese.",
+    rules: 'Describe a rule fight from your game, like "Can I stack +2 on +2?", and I will tell you what the Classic rules say.',
+    house: 'None common.',
+    cards: [],
+    source: 'scope',
+  },
+};
+
+function scopeAnswer(question: string, kind: Exclude<Scope, 'in'>): Answer {
+  return { question, ...SCOPE_ANSWERS[kind] };
 }
 
 function isDailyLimit(e: unknown): boolean {
