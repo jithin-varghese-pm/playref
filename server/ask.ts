@@ -1,7 +1,8 @@
 import { RULES_VERSION } from '../shared/generated/rules-data';
 import { matchFight } from '../shared/match';
 import { normalize } from '../shared/normalize';
-import type { Answer, AskResponse, Fight } from '../shared/types';
+import { fightToAnswer } from '../shared/rules';
+import type { Answer, AskResponse } from '../shared/types';
 import { buildAiInput } from './prompt';
 import { classifyScope } from './scope';
 import type { Store } from './store';
@@ -28,10 +29,6 @@ export interface AskDeps {
   ai: AiRunner;
   store: Store;
   model: string;
-}
-
-export function fightToAnswer(f: Fight, question: string): Answer {
-  return { question, verdict: f.verdict, line: f.line, rules: f.rules, house: f.house, cards: f.cards, source: 'fight' };
 }
 
 function scopeAnswer(question: string, kind: 'other-version' | 'not-uno'): Answer {

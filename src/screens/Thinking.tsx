@@ -1,0 +1,21 @@
+export function Thinking() {
+  return (
+    <main className="screen thinking">
+      <div className="shuffle" aria-hidden="true">
+        <div className="shuffle-card sl" style={{ background: '#0067B1' }} />
+        <div className="shuffle-card sr" style={{ background: '#00A651' }} />
+        <div className="shuffle-card sc" style={{ background: '#FFD100' }}>
+          ?
+        </div>
+      </div>
+      <div role="status" className="thinking-text">
+        <div className="display">
+          Checking the rules<span className="dot1">.</span>
+          <span className="dot2">.</span>
+          <span className="dot3">.</span>
+        </div>
+        <div className="sub">Reading the Classic rules for you</div>
+      </div>
+    </main>
+  );
+}
