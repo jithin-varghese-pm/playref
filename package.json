@@ -1,0 +1,32 @@
+{
+  "name": "playref",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "rules": "node scripts/build-rules.mjs",
+    "dev": "npm run rules && vite",
+    "build": "npm run rules && tsc -b && vite build",
+    "preview:cf": "npm run build && wrangler pages dev dist",
+    "test": "npm run rules && vitest run",
+    "typecheck": "npm run rules && tsc -b",
+    "eval": "node evals/run.mjs"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20261102.1",
+    "@testing-library/dom": "^10.4.0",
+    "@testing-library/react": "^16.1.0",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^6.2.1",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.6.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5",
+    "wrangler": "^4.156.1"
+  }
+}

@@ -1,0 +1,269 @@
+{
+  "game": "uno-classic",
+  "fights": [
+    {
+      "id": "stack-plus2",
+      "button": true,
+      "question": "Can I stack +2 on +2?",
+      "verdict": "HOUSE RULE",
+      "line": "Official rules say no. If a +2 hits you, you draw 2 and miss your turn.",
+      "rules": "A Draw Two makes the next player draw 2 cards and miss their turn, so they never get the chance to pass it on with their own +2.",
+      "house": "Stacking is the most common house rule. Each player adds a +2 and the last one draws the total. Fine if everyone agrees before the game starts.",
+      "cards": ["R7", "R18"],
+      "match": [["+2"], ["stack", "on top", "pass it on", "add my", "add a", "combine", "on a +2", "on +2", "on another +2", "on my", "chain"]]
+    },
+    {
+      "id": "keep-drawing",
+      "button": true,
+      "question": "Do I keep drawing until I can play?",
+      "verdict": "NO",
+      "line": "You draw one card. If it can be played, you may play it. If not, your turn ends.",
+      "rules": "When you have nothing to play, you draw a single card. A playable drawn card may go down right away. Otherwise play moves on.",
+      "house": "Many groups make you keep drawing until you can play. That is a house rule.",
+      "cards": ["R5", "R18"],
+      "match": [["draw", "pick up", "picking up", "take cards", "take a card"], ["until", "till", "keep", "again and again", "more than one", "only one", "just one", "how many"]]
+    },
+    {
+      "id": "plus4-with-colour",
+      "button": true,
+      "question": "Can I play +4 when I have the colour?",
+      "verdict": "NO",
+      "line": "Only when you have no card of the colour on the pile. Matching numbers or symbols are fine.",
+      "rules": "A Wild Draw Four is only allowed when your hand has no card matching the colour of the discard pile. If you play it anyway, the next player can challenge you.",
+      "house": "Many groups let you play it any time. That is a house rule.",
+      "cards": ["R11", "R12"],
+      "match": [["+4"], ["have", "having", "holding", "got", "still had", "had"], ["colour", "color", "matching", "match", "red", "blue", "green", "yellow", "playable", "another card", "other card"]]
+    },
+    {
+      "id": "finish-power-card",
+      "button": true,
+      "question": "Can I finish on a power card?",
+      "verdict": "YES",
+      "line": "You can go out on any card. If it is a +2 or +4, the next player still draws.",
+      "rules": "The round ends when you play your last card, whatever it is. The cards drawn from a final +2 or +4 count when points are added up.",
+      "house": "Some groups ban going out on an action card. That is not in the Classic rules.",
+      "cards": ["R16"],
+      "match": [["finish", "end on", "end with", "last card", "go out", "going out", "win on", "win with", "final card"], ["power", "action", "special", "+2", "+4", "skip", "reverse", "wild"]]
+    },
+    {
+      "id": "forgot-uno",
+      "button": true,
+      "question": "Someone forgot to say UNO. Now what?",
+      "verdict": "RULE",
+      "line": "If you catch them before the next player starts their turn, they draw 2 cards.",
+      "rules": "You must say UNO when you play your second-to-last card. Get caught before the next player begins their turn and you draw 2.",
+      "house": "Some groups add bigger penalties or let you catch someone any time.",
+      "cards": ["R15"],
+      "match": [["forgot", "forget", "didn t say", "didnt say", "did not say", "not say", "doesn t say", "without saying", "no uno", "didn t call", "didnt call", "did not call", "never said", "failed to say"], ["uno"]]
+    },
+    {
+      "id": "seven-zero",
+      "button": true,
+      "question": "Is swapping hands on a 7 a real rule?",
+      "verdict": "HOUSE RULE",
+      "line": "Not in the Classic rules. Swapping on a 7 or passing hands on a 0 is a house rule.",
+      "rules": "Classic UNO has no 7 or 0 swap. The only official hand swap is the Wild Shuffle Hands card, which collects and deals out everyone's cards.",
+      "house": "The 7-0 rule is popular: play a 7 and swap hands with someone, play a 0 and everyone passes hands along. Agree on it before you deal.",
+      "cards": ["R18", "R13"],
+      "match": [["7", "seven", "0", "zero"], ["swap", "switch", "trade", "exchange", "pass hands", "pass our hands", "rotate"]]
+    },
+    {
+      "id": "mixed-stack",
+      "button": false,
+      "question": "Can I play a +2 on a +4, or a +4 on a +2?",
+      "verdict": "HOUSE RULE",
+      "line": "Official rules say no. Whoever is hit draws and misses their turn.",
+      "rules": "Both cards make the next player draw and lose their turn, so they cannot answer with a draw card of their own.",
+      "house": "Some groups allow mixing +2 and +4 in a stack. That is a house rule.",
+      "cards": ["R7", "R11", "R18"],
+      "match": [["+2"], ["+4"], ["stack", "on", "after", "top", "answer", "back"]]
+    },
+    {
+      "id": "stack-plus4",
+      "button": false,
+      "question": "Can I stack +4 on +4?",
+      "verdict": "HOUSE RULE",
+      "line": "Official rules say no. If a +4 hits you, you draw 4 and lose your turn.",
+      "rules": "A Wild Draw Four makes the next player draw 4 and lose their turn, so they cannot play their own +4 back.",
+      "house": "Some groups stack +4s. That is a house rule.",
+      "cards": ["R11", "R18"],
+      "match": [["+4"], ["stack", "on top", "pass it on", "on a +4", "on +4", "on another +4", "after a +4", "back", "chain"]]
+    },
+    {
+      "id": "challenge-plus4",
+      "button": false,
+      "question": "Can I challenge a +4?",
+      "verdict": "YES",
+      "line": "You can challenge before you draw. They show you their hand.",
+      "rules": "If they still had a card of the matching colour, they draw the 4 instead of you. If they were allowed to play it, you draw 6.",
+      "house": "Some groups skip challenges. Then you just draw 4.",
+      "cards": ["R12", "R11"],
+      "match": [["+4"], ["challenge", "challenging", "bluff", "cheat", "cheating", "illegal", "lying", "lied"]]
+    },
+    {
+      "id": "jump-in",
+      "button": false,
+      "question": "Can I jump in out of turn with the same card?",
+      "verdict": "HOUSE RULE",
+      "line": "Not in the Classic rules. You only play on your own turn.",
+      "rules": "Classic UNO has no jump-in. Each player plays one card on their turn.",
+      "house": "Jump-in is a popular house rule: anyone holding the exact same card can slap it down out of turn.",
+      "cards": ["R4", "R18"],
+      "match": [["jump in", "jumping in", "out of turn", "not my turn", "interrupt", "cut in", "slap"]]
+    },
+    {
+      "id": "play-multiple",
+      "button": false,
+      "question": "Can I play two cards of the same number at once?",
+      "verdict": "NO",
+      "line": "One card per turn in the Classic rules.",
+      "rules": "On your turn you play a single card that matches by colour, number or symbol.",
+      "house": "Some groups let you drop several cards of the same number together. That is a house rule.",
+      "cards": ["R4", "R18"],
+      "match": [["two cards", "2 cards", "multiple", "more than one card", "several", "doubles", "pairs", "same number", "three cards", "all my"], ["play", "put down", "drop", "throw", "lay", "at once", "together"]]
+    },
+    {
+      "id": "play-drawn-card",
+      "button": false,
+      "question": "Can I play the card I just drew?",
+      "verdict": "YES",
+      "line": "Yes, if it can be played, in the same turn.",
+      "rules": "After drawing because you could not play, or chose not to, you may play the card you drew if it matches. You may not play a different card from your hand.",
+      "house": "None common.",
+      "cards": ["R5", "R6"],
+      "match": [["drew", "drawn", "just picked up", "picked up", "card i draw", "card i pick"], ["play", "put", "use", "throw"]]
+    },
+    {
+      "id": "draw-on-purpose",
+      "button": false,
+      "question": "Can I draw even when I have a card I could play?",
+      "verdict": "YES",
+      "line": "Yes. You may choose to draw one card instead of playing.",
+      "rules": "If you draw on purpose, you may only play the card you just drew, and only if it matches.",
+      "house": "None common.",
+      "cards": ["R6"],
+      "match": [["draw", "pick up", "take a card"], ["even if", "even though", "even when", "instead", "choose to", "on purpose", "have a playable", "could play", "can play"]]
+    },
+    {
+      "id": "wild-any-time",
+      "button": false,
+      "question": "Can I play a Wild even when I have other cards I could play?",
+      "verdict": "YES",
+      "line": "Yes. A plain Wild can go down on any turn.",
+      "rules": "A Wild can be played on anything, even when you hold other playable cards. The +4 is different: it needs you to have no card of the matching colour.",
+      "house": "None common.",
+      "cards": ["R10", "R11"],
+      "match": [["wild"], ["any time", "anytime", "whenever", "even if", "even though", "even when", "always", "at any", "on anything", "on any card"]]
+    },
+    {
+      "id": "wild-same-colour",
+      "button": false,
+      "question": "Can I pick the same colour with a Wild?",
+      "verdict": "YES",
+      "line": "Yes. You can choose any colour, including the one already in play.",
+      "rules": "When you play a Wild, you pick the colour play continues in, and that can be the current colour.",
+      "house": "None common.",
+      "cards": ["R10"],
+      "match": [["wild", "+4"], ["same colour", "same color", "keep the colour", "keep the color", "current colour", "current color", "colour already", "color already"]]
+    },
+    {
+      "id": "uno-too-late",
+      "button": false,
+      "question": "Can I still catch someone for not saying UNO after the next player started?",
+      "verdict": "NO",
+      "line": "Too late. You have to catch them before the next player begins their turn.",
+      "rules": "The 2-card penalty only applies if they are caught before the next player starts their turn.",
+      "house": "Some groups let you catch someone any time.",
+      "cards": ["R15"],
+      "match": [["uno"], ["catch", "caught", "call out", "called out", "penalty", "penalise", "penalize", "punish"], ["too late", "after the next", "already played", "next player played", "next player started", "next turn", "later", "after their turn"]]
+    },
+    {
+      "id": "first-card-action",
+      "button": false,
+      "question": "What happens if the first card turned over is an action card?",
+      "verdict": "RULE",
+      "line": "It acts on the first player, except a +4, which goes back in the deck.",
+      "rules": "Draw Two: the first player draws 2 and misses their turn. Reverse: the dealer starts and play goes right. Skip: the first player is skipped. Wild: the first player picks the colour. Wild Draw Four: put it back and turn over another card.",
+      "house": "None common.",
+      "cards": ["R3"],
+      "match": [["first card", "starting card", "start card", "flipped over", "turned over", "turned up", "flip the first", "to start", "at the start"], ["+2", "+4", "wild", "skip", "reverse", "action", "special", "power"]]
+    },
+    {
+      "id": "points",
+      "button": false,
+      "question": "How many points is each card worth?",
+      "verdict": "RULE",
+      "line": "Numbers are face value. Skip, Reverse and +2 are 20. Wild and +4 are 50.",
+      "rules": "Wild Shuffle Hands and Wild Customizable are 40 each. The round winner scores the cards left in everyone else's hands, and the first to 500 wins.",
+      "house": "Many groups skip scoring and play single rounds.",
+      "cards": ["R17", "R1"],
+      "match": [["point", "score", "scoring"]]
+    },
+    {
+      "id": "empty-draw-pile",
+      "button": false,
+      "question": "What if the draw pile runs out?",
+      "verdict": "RULE",
+      "line": "Shuffle the discard pile into a new draw pile and keep playing.",
+      "rules": "If nobody has gone out when the draw pile is used up, the discard pile is reshuffled to make a new draw pile.",
+      "house": "None common.",
+      "cards": ["R16"],
+      "match": [["draw pile", "deck", "pile"], ["empty", "runs out", "run out", "ran out", "no cards left", "nothing left", "used up", "finished"]]
+    },
+    {
+      "id": "shuffle-hands-card",
+      "button": false,
+      "question": "What does the Shuffle Hands card do?",
+      "verdict": "RULE",
+      "line": "Everyone's cards are collected, shuffled and dealt back out.",
+      "rules": "Deal starts with the player to the left of whoever played it, and every card is dealt, so hand sizes can change. It is also a Wild, so that player picks the colour.",
+      "house": "None common.",
+      "cards": ["R13"],
+      "match": [["shuffle hands", "shuffle hand", "shuffle card"]]
+    },
+    {
+      "id": "deal-count",
+      "button": false,
+      "question": "How many cards does each player start with?",
+      "verdict": "RULE",
+      "line": "7 cards each.",
+      "rules": "Everyone draws a card, the highest number deals, and the dealer gives each player 7 cards. The player to the dealer's left goes first.",
+      "house": "None common.",
+      "cards": ["R2"],
+      "match": [["how many cards", "deal", "dealt", "cards each", "start with"], ["start", "each", "begin", "hand", "player", "deal"]]
+    },
+    {
+      "id": "skip-card",
+      "button": false,
+      "question": "How does the Skip card work?",
+      "verdict": "RULE",
+      "line": "The next player loses their turn.",
+      "rules": "Play a Skip on a card of the same colour or on another Skip.",
+      "house": "None common.",
+      "cards": ["R9"],
+      "match": [["skip"]]
+    },
+    {
+      "id": "reverse-card",
+      "button": false,
+      "question": "How does the Reverse card work?",
+      "verdict": "RULE",
+      "line": "Play changes direction.",
+      "rules": "Play a Reverse on a card of the same colour or on another Reverse.",
+      "house": "None common.",
+      "cards": ["R8"],
+      "match": [["reverse"]]
+    },
+    {
+      "id": "how-to-win",
+      "button": false,
+      "question": "How do you win UNO?",
+      "verdict": "RULE",
+      "line": "Be first to play all your cards each round. First to 500 points wins the game.",
+      "rules": "The round winner scores the points left in everyone else's hands. Another allowed way: keep a total of the points each player holds, and when someone hits 500, the lowest total wins.",
+      "house": "Many groups play a single round and the first one out wins.",
+      "cards": ["R1"],
+      "match": [["win", "winner", "winning"], ["game", "how do", "how does", "how to", "who"]]
+    }
+  ]
+}
