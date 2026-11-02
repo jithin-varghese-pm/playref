@@ -86,7 +86,9 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
                 className="example"
                 onClick={() => {
                   setQ(ex);
-                  inputRef.current?.focus();
+                  // Only fill the box. Focusing it would pop up the keyboard on phones.
+                  // With a mouse (laptop) focusing is harmless and lets people edit straight away.
+                  if (window.matchMedia?.('(pointer: fine)').matches) inputRef.current?.focus();
                 }}
               >
                 {ex}

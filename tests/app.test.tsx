@@ -134,6 +134,16 @@ describe('App', () => {
     expect(JSON.parse(String(init.body))).toMatchObject({ type: 'bug', message: 'My group plays it differently', page: 'verdict' });
   });
 
+  it('tapping an example question fills the box without focusing it (no keyboard pop-up on phones)', () => {
+    vi.stubGlobal('matchMedia', (q: string) => ({ matches: q === '(pointer: coarse)', addEventListener: () => {}, removeEventListener: () => {} }));
+    render(<App minThinkMs={0} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Who goes first?' }));
+    const box = screen.getByLabelText(/Describe it in your own words/) as HTMLTextAreaElement;
+    expect(box.value).toBe('Who goes first?');
+    expect(document.activeElement).not.toBe(box);
+    expect((screen.getByRole('button', { name: 'Ask the referee' }) as HTMLButtonElement).disabled).toBe(false);
+  });
+
   it('the footer link opens a blank feedback form', async () => {
     render(<App minThinkMs={0} />);
     expect(screen.getByRole('link', { name: 'Report a bug or suggest an idea' }).getAttribute('href')).toBe('#/report');
