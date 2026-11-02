@@ -34,6 +34,7 @@ It is a free fan project, made to show both AI product skills (answers tied to a
 3. **One source of truth.** Button answers and AI answers both come from the same rules file. They must never disagree.
 4. **Honest over confident.** When the AI cannot back its answer with a real rule card, the user sees NOT SURE, not a guess.
 5. **Free stays free.** No paid plan, no card on file. When a free limit is reached, the feature rests until the next day.
+5a. **AI is the last step, not the first.** A typed question reaches the AI only when it matches no known fight and has no saved answer. Mattel's rules sheet may be downloaded and kept locally as a private reference for checking rule cards, but its text is never shipped in the app.
 6. **Colours.** Option A uses UNO-style colours for exploring only. Before a public launch, swap to Playref's own colours.
 7. **Personal identity.** The repo lives on the personal GitHub account `jithin-varghese-pm`, with the personal git name and email set for this repo only. Never the work account.
 
@@ -75,7 +76,12 @@ Phone first. Look: Option A "Red table", with motion. Screens, in the order a us
 |---|---|---|---|
 | B1 | A user taps a fight button | The fixed, checked answer shows at once. No AI call. | Jithin |
 | B2 | A user types a question and taps Ask | The question goes to the Playref server. The browser never holds an AI key. | Derived |
-| B3 | The server gets a typed question | It sends the AI the whole Classic rules file plus the question, and asks for a fixed reply: verdict, one line, rule card IDs used, house-rule note. | Derived |
+| B2a | Step 1: the typed question matches a known fight | The server cleans up the wording (lower case, "draw 2" / "draw two" / "plus two" all become "+2", and the same for +4 and other card names) and checks it against the words listed for each known fight. A confident match returns that fight's checked answer. No AI call. A weak match goes on to step 2. | Jithin |
+| B2b | Step 2: the same cleaned-up question has a saved answer | The saved answer is returned. No AI call. Only answers saved with the current rules file version are used. | Jithin |
+| B2c | An AI answer comes back (step 3) | It is saved for reuse, with the rules file version. NOT SURE answers are not saved. | Derived |
+| B2d | A saved answer gets 3 "No" taps | It is removed from the saved answers and added to the review list for the test set. | Derived |
+| B2e | The rules file changes | All saved answers from the old version stop being used. | Derived |
+| B3 | The question reaches step 3 | The server sends the AI the whole Classic rules file plus the question, and asks for a fixed reply: verdict, one line, rule card IDs used, house-rule note. | Derived |
 | B4 | The AI reply cites a rule card that does not exist, or the reply is broken | The user sees NOT SURE with the closest matching rule card. | Derived |
 | B5 | The question is about another UNO version | The verdict says "Classic only for now". | Jithin |
 | B6 | The question is not about UNO | A polite "I only referee UNO for now". | Derived |
@@ -94,16 +100,18 @@ Src: **Jithin** = decided in chat. **Derived** = follows from a decision and was
 - App: React with TypeScript, built with Vite.
 - Hosting: Cloudflare Pages (free plan), with Pages Functions for the server.
 - AI: Cloudflare Workers AI (free: 10,000 Neurons a day). The exact model is picked during build, after checking Cloudflare's current model list and measuring real questions a day per model.
-- Storage: Cloudflare D1 (free: 100,000 rows written a day) for the per-person limit and the feedback. Not KV, because KV allows only 1,000 writes a day on free.
+- Storage: Cloudflare D1 (free: 100,000 rows written a day) for the per-person limit, the feedback and the saved answers. Not KV, because KV allows only 1,000 writes a day on free.
+- Matching (B2a) is plain local word matching on the server. It uses no AI and no paid service.
 
 **Files**
 
 | Path | What it holds |
 |---|---|
 | `rules/uno-classic.md` | About 20 numbered rule cards (R1, R2, ...). Each card: the official rule in our words and the common house versions. |
-| `rules/uno-classic-fights.json` | The 6 button answers. Each points to its rule cards. |
+| `rules/uno-classic-fights.json` | The known fights: the 6 home-screen buttons plus hidden fights (target about 30, grown from feedback). Each has its checked answer, its rule cards and the words used to match typed questions (B2a). |
+| `rules/reference/` | Private local copy of Mattel's rules sheet, for checking rule cards. Not shipped in the app. |
 | `app/` | The screens and motion. |
-| `functions/ask` | The server for typed questions: limit check, AI call, reply check. |
+| `functions/ask` | The server for typed questions, in order: limit check, step 1 known-fight match, step 2 saved answer, step 3 AI call and reply check, then save. |
 | `functions/feedback` | Saves "Was this right?" taps. |
 | `evals/questions.json` | 50 tricky questions with the right verdict and rule cards. |
 | `evals/run` | Script that scores the app against the 50 questions and writes the result for the Accuracy page. |
@@ -135,3 +143,4 @@ These are not needed to build, but must be done before telling people about Play
 | Date | Change |
 |---|---|
 | 2 Nov 2026 | First version, from the design chat. |
+| 2 Nov 2026 | Added the two steps before any AI call: local known-fight matching (B2a) and saved answers (B2b to B2e). Rule 5a. Private local copy of Mattel's rules sheet. |
