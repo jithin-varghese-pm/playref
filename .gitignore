@@ -5,3 +5,4 @@ dist/
 rules/reference/*.pdf
 shared/generated/
 *.log
+.env*

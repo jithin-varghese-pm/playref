@@ -1,0 +1,19 @@
+{
+  "ranAt": "2026-11-02T11:21:22.708Z",
+  "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+  "rulesVersion": "6a08e2cc10c2",
+  "total": 50,
+  "correct": 48,
+  "misses": [
+    {
+      "question": "can the customizable cards be any rule we want",
+      "expected": "YES (rule R14)",
+      "got": "RULE (verdict RULE)"
+    },
+    {
+      "question": "does the game end after one round",
+      "expected": "NO or RULE (rule R1)",
+      "got": "HOUSE RULE (verdict HOUSE RULE)"
+    }
+  ]
+}

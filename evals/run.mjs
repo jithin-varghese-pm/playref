@@ -23,14 +23,27 @@ const model = /AI_MODEL = "([^"]+)"/.exec(readFileSync(join(root, 'wrangler.toml
 
 if (!token) console.warn('Warning: EVAL_TOKEN is not set, so the rate limit will stop the run after 10 questions.');
 
+/** Retries network errors (some networks reset connections to pages.dev at random). */
+async function askWithRetry(question, tries = 6) {
+  for (let t = 1; ; t++) {
+    try {
+      const r = await fetch(`${base}/api/ask`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-playref-eval': token },
+        body: JSON.stringify({ question }),
+      });
+      return await r.json();
+    } catch (e) {
+      if (t >= tries) throw e;
+      await new Promise((r) => setTimeout(r, 1000 * t));
+    }
+  }
+}
+
 const misses = [];
 let correct = 0;
 for (const [i, item] of questions.entries()) {
-  const res = await fetch(`${base}/api/ask`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-playref-eval': token },
-    body: JSON.stringify({ question: item.q }),
-  }).then((r) => r.json());
+  const res = await askWithRetry(item.q);
 
   if (res.status === 'ai_off') {
     console.error(`Stopped at question ${i + 1}: the free daily AI is used up. Try again after 00:00 UTC.`);
