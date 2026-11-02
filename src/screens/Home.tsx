@@ -61,7 +61,7 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
             value={q}
             maxLength={300}
             disabled={aiOff}
-            placeholder={aiOff ? 'Resting until tomorrow' : 'e.g. My friend played +4 but had red'}
+            placeholder={aiOff ? 'Resting until tomorrow' : 'Describe the fight'}
             onChange={(e) => setQ(e.target.value)}
           />
           <button type="submit" className="ask-btn tap" disabled={aiOff || !q.trim()}>
