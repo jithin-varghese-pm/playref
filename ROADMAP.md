@@ -8,7 +8,7 @@ Goal: real people use it, and we measure it honestly.
 
 1. **Safe to share**
    - ~~UNO-style colours~~ Done 2 Nov 2026: red table kept, four-colour set removed (yellow, white and black only).
-   - Jithin reads all 18 rule cards against Mattel's Classic sheet (GDJ85).
+   - Jithin reads all 19 rule cards against Mattel's Classic sheet (GDJ85).
    - India trademark search for "playref" (IP India, needs Jithin's OTP login).
    - ~~Visitor stats~~ Done 2 Nov 2026: Cloudflare Web Analytics (visitors) + Playref usage counter (`npm run usage`).
    - Cloudflare token in GitHub, so every push deploys on its own.

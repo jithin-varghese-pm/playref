@@ -55,7 +55,7 @@ export function About() {
         <h2>The product calls</h2>
         <ul className="about-list">
           <li>
-            <strong>Answers come from the rulebook, not the model.</strong> 18 rule cards written in plain English and checked against Mattel's Classic rules sheet are the
+            <strong>Answers come from the rulebook, not the model.</strong> 19 rule cards written in plain English and checked against Mattel's Classic rules sheet are the
             single source of truth.
           </li>
           <li>
