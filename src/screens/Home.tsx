@@ -27,7 +27,10 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
           <div className="wordmark">
             Play<span>ref</span>
           </div>
-          <div className="byline">by MBM</div>
+          <div className="byline">
+            <span>by</span>
+            <img src="/mbm-logo.png" alt="Moved By Machines" width={84} height={30} />
+          </div>
         </div>
         <div className="tagline">Unofficial rules referee</div>
       </header>
