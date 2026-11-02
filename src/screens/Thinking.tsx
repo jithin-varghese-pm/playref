@@ -3,8 +3,8 @@ export function Thinking({ embedded = false }: { embedded?: boolean }) {
   return (
     <Tag className={`screen thinking${embedded ? ' panel' : ''}`}>
       <div className="shuffle" aria-hidden="true">
-        <div className="shuffle-card sl" style={{ background: '#0067B1' }} />
-        <div className="shuffle-card sr" style={{ background: '#00A651' }} />
+        <div className="shuffle-card sl" style={{ background: '#1A1A1A' }} />
+        <div className="shuffle-card sr" style={{ background: '#FFFFFF' }} />
         <div className="shuffle-card sc" style={{ background: '#FFD100' }}>
           ?
         </div>

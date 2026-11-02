@@ -3,7 +3,7 @@ import { buttonFights } from '../../shared/rules';
 import type { Fight } from '../../shared/types';
 import { Footer } from './Footer';
 
-const DOTS = ['#C8102E', '#0067B1', '#00A651', '#FFD100'];
+
 const EXAMPLES = ['Can I play a Skip on a Reverse?', 'Who goes first?', 'Can I play a green 7 on a red 7?'];
 
 export function SparkIcon() {
@@ -113,9 +113,9 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
       <section className="fights">
         <h2 className="fights-title">Or tap a common fight</h2>
         <div className="fight-list">
-          {buttonFights.map((f, i) => (
+          {buttonFights.map((f) => (
             <button key={f.id} type="button" className="fight tap" onClick={() => onPick(f)}>
-              <span className="dot" aria-hidden="true" style={{ background: DOTS[i % DOTS.length] }} />
+              <span className="dot" aria-hidden="true" />
               {f.question}
             </button>
           ))}

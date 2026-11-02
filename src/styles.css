@@ -53,7 +53,7 @@ button { font: inherit; }
   border: 0; border-radius: 12px; background: var(--paper); color: var(--ink);
   font-size: 15px; font-weight: 600; text-align: left; cursor: pointer;
 }
-.dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15); }
+.dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; background: var(--sun); box-shadow: inset 0 0 0 2px var(--ink); }
 
 .ask { display: flex; flex-direction: column; gap: 8px; }
 .ask label { font-size: 13px; font-weight: 600; color: var(--soft); }

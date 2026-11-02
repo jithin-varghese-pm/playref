@@ -64,6 +64,7 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 - Full design: `docs/superpowers/specs/2026-11-02-playref-v1-design.md`.
 
 - 2 Nov 2026: Tried MBM black, yellow and cream; **reverted to the red table look** the same day (Jithin: "too boring"). The UNO-style colour item is open again before a wide public share.
+- 2 Nov 2026: **Colour item closed: red table kept, four-colour set removed.** Dots are yellow, shuffle cards and the preview's back card are black, white and yellow. Red plus yellow alone does not read as UNO. Verdict colours (green YES, light blue THE RULE) stay, as they carry meaning.
 
 ## Open decisions
 
