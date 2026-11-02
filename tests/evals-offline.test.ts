@@ -17,8 +17,8 @@ const { questions } = JSON.parse(readFileSync(new URL('../evals/questions.json',
 const noAi = { run: async () => { throw new Error('offline: no AI'); } };
 
 describe('eval set', () => {
-  it('has 50 questions', () => {
-    expect(questions).toHaveLength(50);
+  it('has the full question set', () => {
+    expect(questions.length).toBeGreaterThanOrEqual(50);
   });
 
   it('every question answered without AI (known fight or scope) is right', async () => {

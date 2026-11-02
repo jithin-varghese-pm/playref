@@ -72,6 +72,10 @@ House: Some groups do not allow going out on an action card. That is not in the 
 Official: Number cards score their face value. Draw Two, Reverse and Skip score 20 points each. Wild and Wild Draw Four score 50 points each. Wild Shuffle Hands and Wild Customizable score 40 points each.
 House: None common.
 
+## R19: Cards in the deck
+Official: The deck has 112 cards. Number cards 0 to 9 come in four colours: red, yellow, green and blue. Draw Two, Reverse and Skip come in those four colours too. The Wild cards (Wild, Wild Draw Four, Wild Shuffle Hands and Wild Customizable) have no colour of their own: they are the black cards. There is no black number card. After a Wild, play continues in the colour its player chose, so the next card must match that colour or be another Wild.
+House: None common.
+
 ## R18: Common house rules that are not in the Classic rules
 Official: The Classic rules have none of these: stacking Draw Twos or Wild Draw Fours; swapping hands when a 7 or 0 is played; jumping in out of turn with an identical card; drawing until you can play; playing several cards in one turn; banning going out on an action card.
 House: Any of these is fine if everyone agrees before the game starts. A Wild Customizable card is a good way to add one.

@@ -264,6 +264,17 @@
       "house": "Many groups play a single round and the first one out wins.",
       "cards": ["R1"],
       "match": [["win", "winner", "winning"], ["game", "how do", "how does", "how to", "who"]]
+    },
+    {
+      "id": "black-card",
+      "button": false,
+      "question": "What can I play after a black card?",
+      "verdict": "RULE",
+      "line": "Black cards are Wilds. Play a card in the colour your friend picked, or another Wild.",
+      "rules": "There are no black number cards. Whoever plays a Wild picks the colour, and the next card must be that colour or another Wild. So a yellow 4 is fine if they picked yellow.",
+      "house": "None common.",
+      "cards": ["R19", "R10"],
+      "match": [["black"]]
     }
   ]
 }

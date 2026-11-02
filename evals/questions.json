@@ -43,6 +43,7 @@
     { "group": "new", "q": "is it 7 cards each at the start", "verdicts": ["YES", "RULE"], "cards": ["R2"] },
     { "group": "new", "q": "does the game end after one round", "verdicts": ["NO", "RULE"], "cards": ["R1"] },
     { "group": "new", "q": "do I have to say uno when I have one card left", "verdicts": ["YES", "RULE"], "cards": ["R15"] },
+    { "group": "reported", "q": "Can I put 4 yellow if my friend put 1 black", "verdicts": ["RULE", "YES"], "cards": ["R19", "R10"] },
 
     { "group": "other-version", "q": "uno no mercy draw 10 rules", "verdicts": ["NOT SURE"], "label": "CLASSIC ONLY" },
     { "group": "other-version", "q": "how does the flip side work in uno flip", "verdicts": ["NOT SURE"], "label": "CLASSIC ONLY" },
