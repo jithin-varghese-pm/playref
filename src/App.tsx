@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { fightToAnswer } from '../shared/rules';
 import type { Answer } from '../shared/types';
 import { ask, track } from './lib/api';
+import { getReportContext } from './lib/reportContext';
 import { useMediaQuery } from './lib/useMediaQuery';
+import { Report } from './screens/Report';
 import { About } from './screens/About';
 import { Accuracy } from './screens/Accuracy';
 import { EmptyPanel } from './screens/EmptyPanel';
@@ -41,6 +43,7 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
 
   if (hash === '#/accuracy') return <Accuracy />;
   if (hash === '#/about') return <About />;
+  if (hash === '#/report') return <Report context={getReportContext()} wide={wide} />;
 
   async function onAsk(question: string) {
     setNotice(null);

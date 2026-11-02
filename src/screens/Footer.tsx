@@ -1,4 +1,5 @@
 import { LINKS } from '../lib/links';
+import { setReportContext } from '../lib/reportContext';
 
 export function Footer({ showAccuracy = false }: { showAccuracy?: boolean }) {
   return (
@@ -13,6 +14,9 @@ export function Footer({ showAccuracy = false }: { showAccuracy?: boolean }) {
           </a>
         </div>
       )}
+      <a href="#/report" className="footer-link report-link" onClick={() => setReportContext(null)}>
+        Report a bug or suggest an idea
+      </a>
       <p className="credit">
         Built by <strong>Jithin Varghese</strong>
         <span aria-hidden="true"> · </span>

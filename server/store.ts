@@ -1,4 +1,5 @@
 import type { Answer } from '../shared/types';
+import type { ReportRow, ReportStore } from './report';
 
 export interface FeedbackRow {
   key: string;
@@ -25,7 +26,15 @@ export interface Store {
   bump(day: string, event: string, key: string): Promise<void>;
 }
 
-export class MemoryStore implements Store {
+export class MemoryStore implements Store, ReportStore {
+  reports: ReportRow[] = [];
+  async countReports(clientId: string, since: number) {
+    return this.reports.filter((r) => r.clientId === clientId && r.at > since).length;
+  }
+  async addReport(row: ReportRow) {
+    this.reports.push(row);
+  }
+
   hits: { clientId: string; at: number }[] = [];
   saved = new Map<string, { answer: Answer; no: number }>();
   feedback: FeedbackRow[] = [];
@@ -74,8 +83,19 @@ export interface D1Like {
   };
 }
 
-export class D1Store implements Store {
+export class D1Store implements Store, ReportStore {
   constructor(private db: D1Like) {}
+
+  async countReports(clientId: string, since: number) {
+    const row = await this.db.prepare('SELECT COUNT(*) AS n FROM reports WHERE client_id = ? AND at > ?').bind(clientId, since).first<{ n: number }>();
+    return row?.n ?? 0;
+  }
+  async addReport(r: ReportRow) {
+    await this.db
+      .prepare('INSERT INTO reports (at, type, message, contact, context, page, device, client_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(r.at, r.type, r.message, r.contact, r.context, r.page, r.device, r.clientId)
+      .run();
+  }
 
   async countHits(clientId: string, since: number) {
     const row = await this.db.prepare('SELECT COUNT(*) AS n FROM rate_hits WHERE client_id = ? AND at > ?').bind(clientId, since).first<{ n: number }>();

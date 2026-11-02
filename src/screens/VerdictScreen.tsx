@@ -4,6 +4,7 @@ import { RULES_SHEET_URL, verdictWord } from '../../shared/rules';
 import { SparkIcon } from './Home';
 import type { Answer, Verdict } from '../../shared/types';
 import { sendFeedback, track } from '../lib/api';
+import { setReportContext } from '../lib/reportContext';
 import { shareVerdict } from '../lib/share';
 import { Footer } from './Footer';
 
@@ -74,6 +75,10 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
           </div>
         </section>
       </div>
+
+      <a href="#/report" className="wrong-link up1" onClick={() => setReportContext(answer)}>
+        Something wrong with this answer? Tell us
+      </a>
 
       <section className="detail up1">
         <h2>What the rules say</h2>

@@ -114,6 +114,31 @@ describe('App', () => {
     expect(screen.getByRole('link', { name: 'Connect on LinkedIn' })).toBeTruthy();
   });
 
+  it('"Something wrong with this answer?" opens the form with the answer attached, and sends it', async () => {
+    render(<App minThinkMs={0} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Can I stack +2 on +2?' }));
+    fireEvent.click(screen.getByRole('link', { name: /Something wrong with this answer/ }));
+    window.location.hash = '#/report';
+    window.dispatchEvent(new HashChangeEvent('hashchange'));
+    await waitFor(() => expect(screen.getByText('About this answer')).toBeTruthy());
+    expect(screen.getByText(/Can I stack \+2 on \+2\?/)).toBeTruthy();
+    expect((screen.getByRole('radio', { name: /Report a bug/ }) as HTMLInputElement).checked).toBe(true);
+
+    const fetch = vi.fn(async () => ({ ok: true, json: async () => ({ ok: true }) }));
+    vi.stubGlobal('fetch', fetch);
+    fireEvent.change(screen.getByLabelText('Your message'), { target: { value: 'My group plays it differently' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Send feedback' }));
+    await waitFor(() => expect(screen.getByText('Thank you!')).toBeTruthy());
+    const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('/api/report');
+    expect(JSON.parse(String(init.body))).toMatchObject({ type: 'bug', message: 'My group plays it differently', page: 'verdict' });
+  });
+
+  it('the footer link opens a blank feedback form', async () => {
+    render(<App minThinkMs={0} />);
+    expect(screen.getByRole('link', { name: 'Report a bug or suggest an idea' }).getAttribute('href')).toBe('#/report');
+  });
+
   it('Classic-only answers show their own label', async () => {
     mockFetch({
       status: 'ok',

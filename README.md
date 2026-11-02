@@ -26,11 +26,13 @@ Players can also mark AI answers right or wrong. Three "No" votes remove a saved
 
 Cloudflare Web Analytics counts visitors (no cookies). A small usage counter in D1 keeps daily totals of in-app actions (fight taps, how typed questions were answered, shares, votes), never who did them. `npm run usage` prints the summary.
 
+People can report a bug or suggest an idea from any screen (and flag a specific answer from the verdict screen). Messages land in D1; `npm run feedback` lists new ones and `npm run feedback -- --done <id>` marks one as handled. A hidden honeypot field and a 5-an-hour limit keep spam out.
+
 ## Stack
 
 - React 18 + TypeScript + Vite
 - Cloudflare Pages + Pages Functions, Workers AI (free daily allocation), D1
-- Vitest (72 tests) and Testing Library
+- Vitest (79 tests) and Testing Library
 
 ```
 rules/            rule cards (source of truth) and known fights

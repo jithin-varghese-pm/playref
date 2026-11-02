@@ -110,6 +110,33 @@ button { font: inherit; }
 .rule-chips { margin: 4px 0 2px; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px; }
 .rule-chips li { padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, 0.16); font-size: 12px; font-weight: 600; }
 
+/* Feedback form */
+.report-link { color: var(--sun); }
+.wrong-link { align-self: flex-start; font-size: 13px; font-weight: 600; }
+.report-card { display: flex; flex-direction: column; gap: 14px; padding: 18px; border-radius: 20px; background: var(--paper); color: var(--ink); }
+.report-card a { color: var(--ink); }
+.report-title { font-size: 32px; color: var(--ink); }
+.report-types { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.report-types legend { font-size: 14px; font-weight: 700; margin-bottom: 8px; padding: 0; }
+.report-type { display: grid; grid-template-columns: auto 1fr; column-gap: 10px; align-items: center; padding: 10px 12px; border: 2px solid #ddd; border-radius: 12px; cursor: pointer; }
+.report-type.on { border-color: var(--ink); background: #fff8d6; }
+.report-type input { grid-row: span 2; width: 18px; height: 18px; accent-color: var(--ink); margin: 0; }
+.rt-label { font-weight: 700; font-size: 15px; }
+.rt-hint { font-size: 13px; color: #4a4a4a; }
+.report-context { background: #f2f2f2; border-radius: 10px; padding: 10px 12px; font-size: 13px; }
+.report-context span { font-weight: 700; }
+.report-context p { margin: 4px 0 0; line-height: 1.4; }
+.report-field { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 600; }
+.report-field textarea, .report-field input {
+  width: 100%; padding: 12px 14px; border-radius: 12px; border: 2px solid var(--ink); background: #fff;
+  color: var(--ink); font: 400 16px/1.4 var(--body); resize: vertical;
+}
+.report-card .ask-btn { width: 100%; height: 54px; font-size: 16px; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+.report-error { margin: 0; color: #a10d24; font-weight: 600; font-size: 14px; }
+.report-note { margin: 0; font-size: 12px; color: #4a4a4a; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+@media (min-width: 900px) { .report { max-width: 560px; padding-top: 40px; } }
+
 .footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; font-size: 11px; line-height: 1.5; color: var(--soft); }
 .footer p { margin: 0; }
 .footer-link { font-size: 13px; font-weight: 600; }

@@ -11,7 +11,8 @@
     "test": "npm run rules && vitest run",
     "typecheck": "npm run rules && tsc -b",
     "eval": "node evals/run.mjs",
-    "usage": "node scripts/usage.mjs"
+    "usage": "node scripts/usage.mjs",
+    "feedback": "node scripts/feedback.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

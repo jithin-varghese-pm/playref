@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import type { IncomingMessage } from 'node:http';
 import { askQuestion } from './server/ask';
 import { recordFeedback } from './server/feedback';
+import { submitReport } from './server/report';
 import { MemoryStore } from './server/store';
 
 const LOCAL_AI_MESSAGE =
@@ -45,6 +46,13 @@ function localApi(): Plugin {
       server.middlewares.use('/api/event', (_req, res) => {
         res.statusCode = 204;
         res.end();
+      });
+      // Feedback form: kept in memory and printed in the dev terminal, never sent to the real database.
+      server.middlewares.use('/api/report', async (req, res) => {
+        const result = await submitReport(await readJson(req), 'local', Date.now(), store);
+        if (result.ok) console.log('[playref] feedback received locally:', store.reports.at(-1));
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify(result));
       });
       server.middlewares.use('/api/feedback', async (req, res) => {
         const b = await readJson(req);
