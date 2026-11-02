@@ -17,6 +17,18 @@ type Screen = { name: 'home' } | { name: 'thinking' } | { name: 'verdict'; answe
 /** Laptop and wide tablet screens get the split layout. Must match the CSS breakpoint. */
 export const WIDE_QUERY = '(min-width: 900px)';
 
+function noticeCard(question: string, res: { status: 'rate_limited' } | { status: 'error'; message: string }): Answer {
+  const base = { question, verdict: 'NOT SURE' as const, house: 'None common.', cards: [], source: 'scope' as const };
+  return res.status === 'rate_limited'
+    ? {
+        ...base,
+        label: 'TIME OUT',
+        line: "You've asked a lot of new questions this hour.",
+        rules: 'The common fights still answer instantly. New questions open up again within the hour.',
+      }
+    : { ...base, label: 'OOPS', line: res.message, rules: 'The common fights still answer instantly. Try your question again in a moment.' };
+}
+
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function useHashRoute() {
@@ -53,9 +65,12 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
       setScreen({ name: 'verdict', answer: res.answer, feedbackKey: res.feedbackKey });
       return;
     }
+    if (res.status === 'rate_limited' || res.status === 'error') {
+      // Show it as a card where the verdict would be, so it cannot be missed on a phone or a laptop.
+      setScreen({ name: 'verdict', answer: noticeCard(question, res), feedbackKey: null });
+      return;
+    }
     if (res.status === 'ai_off') setAiOff(true);
-    if (res.status === 'rate_limited') setNotice("You've asked a lot this hour. Try the common fights, or ask again a little later.");
-    if (res.status === 'error') setNotice(res.message);
     setScreen({ name: 'home' });
   }
 

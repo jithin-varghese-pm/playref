@@ -96,17 +96,11 @@ function isJsonModeFailure(e: unknown): boolean {
   return /JSON Mode couldn.t be met/i.test(String(e instanceof Error ? e.message : e));
 }
 
-/** The whole typed-question path: limit, scope, known fight, saved answer, then AI. */
+/** The whole typed-question path: scope, known fight, saved answer, then (within the hourly limit) AI. */
 export async function askQuestion(input: AskInput, deps: AskDeps): Promise<AskResponse> {
   const question = input.question.trim();
   if (!question) return { status: 'error', message: 'Type a question first.' };
   if (question.length > MAX_QUESTION_LENGTH) return { status: 'error', message: 'Keep it under 300 characters.' };
-
-  if (!input.evalMode) {
-    const recent = await deps.store.countHits(input.clientId, input.now - HOUR);
-    if (recent >= RATE_LIMIT_PER_HOUR) return { status: 'rate_limited' };
-    await deps.store.addHit(input.clientId, input.now);
-  }
 
   const scope = classifyScope(question);
   if (scope !== 'in') return { status: 'ok', answer: scopeAnswer(question, scope), feedbackKey: null };
@@ -120,6 +114,14 @@ export async function askQuestion(input: AskInput, deps: AskDeps): Promise<AskRe
   if (!input.evalMode) {
     const saved = await deps.store.getSaved(key, RULES_VERSION);
     if (saved) return { status: 'ok', answer: { ...saved, question, source: 'saved' }, feedbackKey: key };
+  }
+
+  // The hourly limit only counts questions that are about to use AI.
+  // Known fights, saved answers and blocked messages cost nothing, so they never use it up.
+  if (!input.evalMode) {
+    const recent = await deps.store.countHits(input.clientId, input.now - HOUR);
+    if (recent >= RATE_LIMIT_PER_HOUR) return { status: 'rate_limited' };
+    await deps.store.addHit(input.clientId, input.now);
   }
 
   // Step 3: the AI, with the whole rules file.

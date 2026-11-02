@@ -71,7 +71,8 @@ describe('App', () => {
     render(<App minThinkMs={0} />);
     fireEvent.change(screen.getByLabelText(/Describe it in your own words/), { target: { value: 'something new' } });
     fireEvent.click(screen.getByRole('button', { name: 'Ask the referee' }));
-    await waitFor(() => expect(screen.getByText(/asked a lot this hour/)).toBeTruthy());
+    await waitFor(() => expect(screen.getByLabelText('Verdict').textContent).toContain('TIME'));
+    expect(screen.getByText("You've asked a lot of new questions this hour.")).toBeTruthy();
   });
 
   it('on a laptop, fights and the verdict show side by side', () => {

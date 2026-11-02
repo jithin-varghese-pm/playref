@@ -144,19 +144,31 @@ describe('askQuestion', () => {
     expect(r.status === 'ok' && r.answer.verdict).toBe('NOT SURE');
   });
 
-  it(`limits each person to ${RATE_LIMIT_PER_HOUR} typed questions an hour`, async () => {
+  it(`limits each person to ${RATE_LIMIT_PER_HOUR} AI questions an hour`, async () => {
     const store = new MemoryStore();
     const deps = { ai: fakeAi(), store, model: 'm' };
+    const newQ = (i: number) => `${NEW_Q} number ${i}`;
     for (let i = 0; i < RATE_LIMIT_PER_HOUR; i++) {
-      const r = await askQuestion({ ...base, question: 'can we stack draw 2s', now: base.now + i }, deps);
+      const r = await askQuestion({ ...base, question: newQ(i), now: base.now + i }, deps);
       expect(r.status).toBe('ok');
     }
-    const blocked = await askQuestion({ ...base, question: 'can we stack draw 2s', now: base.now + 20 }, deps);
+    const blocked = await askQuestion({ ...base, question: newQ(99), now: base.now + 20 }, deps);
     expect(blocked.status).toBe('rate_limited');
-    const otherPerson = await askQuestion({ ...base, clientId: 'c2', question: 'can we stack draw 2s' }, deps);
+    const otherPerson = await askQuestion({ ...base, clientId: 'c2', question: newQ(99) }, deps);
     expect(otherPerson.status).toBe('ok');
-    const anHourLater = await askQuestion({ ...base, question: 'can we stack draw 2s', now: base.now + 3_600_001 }, deps);
+    const anHourLater = await askQuestion({ ...base, question: newQ(98), now: base.now + 3_600_001 }, deps);
     expect(anHourLater.status).toBe('ok');
+  });
+
+  it('never limits answers that use no AI (known fights, saved answers, blocked messages)', async () => {
+    const store = new MemoryStore();
+    const deps = { ai: fakeAi(), store, model: 'm' };
+    for (let i = 0; i < RATE_LIMIT_PER_HOUR * 3; i++) {
+      for (const q of ['can we stack draw 2s', 'hello', 'how do you castle in chess']) {
+        expect((await askQuestion({ ...base, question: q, now: base.now + i }, deps)).status).toBe('ok');
+      }
+    }
+    expect(store.hits).toHaveLength(0);
   });
 
   it('answers other UNO versions with "Classic only" and no AI', async () => {
