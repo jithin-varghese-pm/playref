@@ -66,6 +66,8 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 - 2 Nov 2026: Tried MBM black, yellow and cream; **reverted to the red table look** the same day (Jithin: "too boring"). The UNO-style colour item is open again before a wide public share.
 - 2 Nov 2026: **Colour item closed: red table kept, four-colour set removed.** Dots are yellow, shuffle cards and the preview's back card are black, white and yellow. Red plus yellow alone does not read as UNO. Verdict colours (green YES, light blue THE RULE) stay, as they carry meaning.
 
+- 2 Nov 2026: **Share link for LinkedIn: https://jithin-varghese-pm.github.io/playref/** (forwards to playref.pages.dev/?ref=li). LinkedIn's post editor showed "Cannot display preview" for every playref.pages.dev link even though Post Inspector rendered it; the github.io link worked first time. Use the github.io link for LinkedIn shares. Source: `portfolio-site/playref/` (update its og-image.jpg if the preview image changes).
+
 ## Open decisions
 
 - Review of the design document.
