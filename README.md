@@ -18,7 +18,7 @@ Questions about other UNO versions (No Mercy, Flip...) or other games are caught
 
 ## How accurate is it?
 
-`evals/questions.json` holds 50 tricky questions with known right answers, checked against Mattel's Classic rules sheet. `npm run eval` scores the live app and publishes the result to the in-app Accuracy page, including every miss. A release stops if the score drops. 42 of the 50 are answered correctly with no AI at all; the other 8 are scored against the live model.
+`evals/questions.json` holds 50 tricky questions with known right answers, checked against Mattel's Classic rules sheet. `npm run eval` scores the live app and publishes the result to the in-app Accuracy page, including every miss. A release stops if the score drops. First live run (2 Nov 2026): 48 of 50, with 41 answered without any AI call.
 
 Players can also mark AI answers right or wrong. Three "No" votes remove a saved answer and send it for review.
 
@@ -30,7 +30,7 @@ Cloudflare Web Analytics counts visitors (no cookies). A small usage counter in 
 
 - React 18 + TypeScript + Vite
 - Cloudflare Pages + Pages Functions, Workers AI (free daily allocation), D1
-- Vitest (64 tests) and Testing Library
+- Vitest (72 tests) and Testing Library
 
 ```
 rules/            rule cards (source of truth) and known fights
