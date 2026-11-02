@@ -8,8 +8,8 @@ binding = "AI"
 [[d1_databases]]
 binding = "DB"
 database_name = "playref"
-# Filled in after `npx wrangler d1 create playref` on Jithin's Cloudflare account.
-database_id = "00000000-0000-0000-0000-000000000000"
+# Created 2 Nov 2026 on Jithin's personal Cloudflare account.
+database_id = "3e8a1b61-cccf-476e-bb64-206810697130"
 migrations_dir = "migrations"
 
 [vars]
