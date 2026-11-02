@@ -144,3 +144,4 @@ These are not needed to build, but must be done before telling people about Play
 |---|---|
 | 2 Nov 2026 | First version, from the design chat. |
 | 2 Nov 2026 | Added the two steps before any AI call: local known-fight matching (B2a) and saved answers (B2b to B2e). Rule 5a. Private local copy of Mattel's rules sheet. |
+| 2 Nov 2026 | Build changes: fifth verdict **THE RULE** for "what happens / how does it work" questions (yes/no did not fit them). B5 and B6 show on the card as **CLASSIC ONLY** and **UNO ONLY**. Rules source is Mattel's Classic sheet GDJ85 (the first link was the "UNO House Rules" product). AI model: `@cf/meta/llama-3.3-70b-instruct-fp8-fast`, JSON mode, about 90 new questions a day on the free allocation. |
