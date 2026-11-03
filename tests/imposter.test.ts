@@ -104,14 +104,29 @@ describe('Imposter engine', () => {
     expect(pack.words).toContain(pickWord(pack, used, rng));
   });
 
-  it('deals a full round and shows the imposter the category but not the word (rule I3)', () => {
+  it('gives the imposter no word and no category (rule I3)', () => {
     const round = dealRound(6, 'kerala-food', freshFairness(6), [], seeded(1));
     expect(round.imposters).toHaveLength(1);
     const imp = round.imposters[0];
     const civilian = [0, 1, 2, 3, 4, 5].find((i) => i !== imp)!;
-    expect(cardFor(round, imp)).toEqual({ title: 'YOU ARE THE', main: 'IMPOSTER', category: 'Food' });
-    expect(cardFor(round, civilian)).toEqual({ title: 'YOUR WORD', main: round.word, category: 'Food' });
-    expect(JSON.stringify(cardFor(round, imp))).not.toContain(round.word);
+    const impCard = cardFor(round, imp);
+    expect(impCard).toEqual({ title: 'YOU ARE THE', main: 'IMPOSTER', note: 'Blend in and find the word' });
+    expect(JSON.stringify(impCard)).not.toContain(round.word);
+    expect(JSON.stringify(impCard).toLowerCase()).not.toContain('food');
+    expect(cardFor(round, civilian)).toEqual({ title: 'YOUR WORD', main: round.word, note: "Don't say it out loud" });
+    // Same shape for both, so the layout gives nothing away.
+    expect(Object.keys(impCard)).toEqual(Object.keys(cardFor(round, civilian)));
+  });
+
+  it('"Surprise me" picks a real pack each round', () => {
+    const rng = seeded(11);
+    const ids = new Set<string>();
+    for (let i = 0; i < 60; i++) {
+      const r = dealRound(4, 'surprise', freshFairness(4), [], rng);
+      ids.add(r.packId);
+      expect(WORD_PACKS.find((p) => p.id === r.packId)!.words).toContain(r.word);
+    }
+    expect(ids.size).toBeGreaterThan(3);
   });
 
   it('rejects player counts outside 3 to 10', () => {

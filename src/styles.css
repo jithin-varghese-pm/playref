@@ -162,6 +162,13 @@ button { font: inherit; }
 .stepper button.dark { background: var(--ink); color: var(--sun); }
 .stepper button:disabled { opacity: 0.35; cursor: not-allowed; }
 .stepper-num { font-family: var(--display); font-weight: 800; font-style: italic; font-size: 36px; min-width: 32px; text-align: center; }
+.imp-names { border: 0; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.imp-names legend { margin-bottom: 8px; }
+.name-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.name-grid input { min-width: 0; height: 44px; padding: 0 12px; border-radius: 10px; border: 1.5px solid #bbb; background: #fff; color: var(--ink); font: 500 15px var(--body); }
+.name-grid input:focus { border-color: var(--ink); outline: none; box-shadow: 0 0 0 3px var(--sun); }
+.imp-packs .imp-hint { flex-basis: 100%; margin: 4px 0 0; }
+.imp-names .imp-hint { margin: 0; }
 .imp-packs { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
 .imp-packs legend { margin-bottom: 8px; }
 .pack { padding: 8px 12px; border-radius: 999px; border: 1.5px solid #ccc; background: #fff; color: var(--ink); font: 600 13px var(--body); cursor: pointer; min-height: 36px; }

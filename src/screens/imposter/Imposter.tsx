@@ -1,6 +1,16 @@
 import { useEffect, useState, type KeyboardEvent } from 'react';
 import { IMPOSTER_FIGHTS } from '../../../shared/generated/imposter-data';
-import { cardFor, dealRound, freshFairness, MAX_PLAYERS, MIN_PLAYERS, updateFairness, type Fairness, type Round } from '../../../shared/imposter/engine';
+import {
+  cardFor,
+  dealRound,
+  freshFairness,
+  MAX_PLAYERS,
+  MIN_PLAYERS,
+  SURPRISE,
+  updateFairness,
+  type Fairness,
+  type Round,
+} from '../../../shared/imposter/engine';
 import { WORD_PACKS } from '../../../shared/imposter/words';
 import { fightToAnswer } from '../../../shared/rules';
 import type { Answer } from '../../../shared/types';
@@ -29,16 +39,22 @@ interface Saved {
   packId: string;
   fairness: Fairness;
   used: string[];
+  /** Optional player names, remembered on this phone. Empty means "Player N". */
+  names: string[];
 }
+
+export const MAX_NAME = 16;
 
 function load(): Saved {
   try {
-    const s = JSON.parse(localStorage.getItem(STORE) ?? 'null') as Saved | null;
-    if (s && s.players >= MIN_PLAYERS && s.players <= MAX_PLAYERS) return s;
+    const s = JSON.parse(localStorage.getItem(STORE) ?? 'null') as Partial<Saved> | null;
+    if (s && typeof s.players === 'number' && s.players >= MIN_PLAYERS && s.players <= MAX_PLAYERS && s.fairness) {
+      return { players: s.players, packId: s.packId ?? SURPRISE, fairness: s.fairness, used: s.used ?? [], names: Array.isArray(s.names) ? s.names : [] };
+    }
   } catch {
     // Private mode or blocked storage: start fresh.
   }
-  return { players: 5, packId: WORD_PACKS[0].id, fairness: freshFairness(5), used: [] };
+  return { players: 5, packId: SURPRISE, fairness: freshFairness(5), used: [], names: [] };
 }
 
 function save(s: Saved) {
@@ -49,11 +65,10 @@ function save(s: Saved) {
   }
 }
 
-const name = (i: number) => `Player ${i + 1}`;
-const list = (ids: number[]) => ids.map(name).join(' and ');
-
 export function Imposter() {
   const [saved, setSaved] = useState<Saved>(load);
+  const name = (i: number) => saved.names[i]?.trim() || `Player ${i + 1}`;
+  const list = (ids: number[]) => ids.map(name).join(' and ');
   const [round, setRound] = useState<Round | null>(null);
   const [phase, setPhase] = useState<Phase>({ name: 'setup' });
   const [caught, setCaught] = useState<number[]>([]);
@@ -105,7 +120,8 @@ export function Imposter() {
   }
 
   if (phase.name === 'setup') {
-    const pack = WORD_PACKS.find((p) => p.id === saved.packId) ?? WORD_PACKS[0];
+    const packs = [{ id: SURPRISE, name: 'Surprise me' }, ...WORD_PACKS];
+    const pack = packs.find((p) => p.id === saved.packId) ?? packs[0];
     const fights = IMPOSTER_FIGHTS.filter((f) => f.button || showMore);
     return (
       <main className="screen imposter">
@@ -129,14 +145,41 @@ export function Imposter() {
             </div>
           </div>
           <p className="imp-hint">{saved.players >= 7 ? '2 hidden imposters' : '1 hidden imposter'} for this group.</p>
+          <fieldset className="imp-names">
+            <legend className="imp-label">Names (optional)</legend>
+            <div className="name-grid">
+              {Array.from({ length: saved.players }, (_, i) => (
+                <input
+                  key={i}
+                  type="text"
+                  aria-label={`Name for player ${i + 1}`}
+                  placeholder={`Player ${i + 1}`}
+                  maxLength={MAX_NAME}
+                  value={saved.names[i] ?? ''}
+                  autoComplete="off"
+                  onChange={(e) =>
+                    setSaved((s) => {
+                      const names = [...s.names];
+                      names[i] = e.target.value;
+                      return { ...s, names };
+                    })
+                  }
+                />
+              ))}
+            </div>
+            <p className="imp-hint">Go round the circle in seating order, so "clockwise" works.</p>
+          </fieldset>
           <fieldset className="imp-packs">
             <legend className="imp-label">Word pack</legend>
-            {WORD_PACKS.map((p) => (
+            {packs.map((p) => (
               <button key={p.id} type="button" className={`pack${p.id === pack.id ? ' on' : ''}`} aria-pressed={p.id === pack.id} onClick={() => setSaved((s) => ({ ...s, packId: p.id }))}>
                 {p.id === pack.id ? '✓ ' : ''}
                 {p.name}
               </button>
             ))}
+            <p className="imp-hint">
+              {pack.id === SURPRISE ? 'A random pack each round, kept secret, so the imposter has no idea of the category.' : 'Everyone, including the imposter, will know the category.'}
+            </p>
           </fieldset>
           <button type="button" className="ask-btn tap imp-start" onClick={start}>
             Start game
@@ -180,7 +223,7 @@ export function Imposter() {
     return (
       <main className="screen imposter imp-dark">
         <div className="imp-top">
-          <span>Imposter · {WORD_PACKS.find((p) => p.id === round.packId)?.name}</span>
+          <span>Imposter</span>
           {!phase.peek && (
             <span>
               {phase.player} of {round.players} seen
@@ -223,6 +266,7 @@ export function Imposter() {
           <h1 className="display imp-title">{early ? 'Who is guessing early?' : 'Who forgot their word?'}</h1>
           <p className="imp-sub">{early ? 'An imposter can stop the game and guess the word once. Right wins, wrong loses (rule I11).' : 'Only that player should look at the phone.'}</p>
           <PlayerGrid
+            name={name}
             players={round.players}
             onPick={(p) => {
               if (!early) return setPhase({ name: 'pass', player: p, seen: false, peek: true });
@@ -305,7 +349,7 @@ export function Imposter() {
               Tie: each tied player gives one more clue word, then vote again between them only. Still tied? The imposters win.
             </p>
           )}
-          <PlayerGrid players={round.players} disabled={caught} onPick={accuse} />
+          <PlayerGrid players={round.players} disabled={caught} onPick={accuse} name={name} />
           {!phase.tie ? (
             <button type="button" className="more-link dark" onClick={() => setPhase({ name: 'vote', tie: true })}>
               It's a tie
@@ -398,7 +442,7 @@ function Brand() {
   );
 }
 
-function PlayerGrid({ players, disabled = [], onPick }: { players: number; disabled?: number[]; onPick: (p: number) => void }) {
+function PlayerGrid({ players, disabled = [], onPick, name }: { players: number; disabled?: number[]; onPick: (p: number) => void; name: (i: number) => string }) {
   return (
     <div className="player-grid">
       {Array.from({ length: players }, (_, i) => (
@@ -414,7 +458,7 @@ function PlayerGrid({ players, disabled = [], onPick }: { players: number; disab
  * Rule I4: hold to see, release to hide. Every card has the same size and layout,
  * and there is no sound or vibration, so nothing gives the imposter away.
  */
-function HoldCard({ card, onSeen }: { card: { title: string; main: string; category: string }; onSeen: () => void }) {
+function HoldCard({ card, onSeen }: { card: { title: string; main: string; note: string }; onSeen: () => void }) {
   const [open, setOpen] = useState(false);
   const show = () => {
     setOpen(true);
@@ -431,7 +475,7 @@ function HoldCard({ card, onSeen }: { card: { title: string; main: string; categ
     <button
       type="button"
       className={`hold-card${open ? ' open' : ''}`}
-      aria-label={open ? `${card.title} ${card.main}. Category ${card.category}.` : 'Hold to see your card'}
+      aria-label={open ? `${card.title} ${card.main}. ${card.note}.` : "Hold to see your card"}
       onPointerDown={show}
       onPointerUp={hide}
       onPointerLeave={hide}
@@ -446,7 +490,7 @@ function HoldCard({ card, onSeen }: { card: { title: string; main: string; categ
           <>
             <span className="hold-title">{card.title}</span>
             <span className="hold-main">{card.main}</span>
-            <span className="hold-cat">Category: {card.category}</span>
+            <span className="hold-cat">{card.note}</span>
           </>
         ) : (
           <>

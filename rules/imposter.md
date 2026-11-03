@@ -13,8 +13,8 @@ Official: 1 imposter for 3 to 6 players, 2 imposters for 7 to 10. The screen nev
 House: Some groups always play with 2 imposters, or let the imposters know each other.
 
 ## I3: What everyone sees
-Official: Everyone sees the category. Everyone except the imposter also sees the secret word. The imposter sees "You are the Imposter" plus the category, on a card that looks exactly like everyone else's.
-House: In a harder version the imposter sees no category. In the decoy version the imposter gets a similar word and is not told.
+Official: Everyone except the imposter sees the secret word. The imposter sees only "You are the Imposter", with no word and no category, on a card that looks exactly like everyone else's. To keep the category secret too, let the app pick a surprise word pack.
+House: In an easier version the imposter is told the category (for example "Food"). In the decoy version the imposter gets a similar word and is not told.
 
 ## I4: Dealing the cards
 Official: Pass the phone to each player in turn. They hold the button to see their card, and it hides as soon as they let go. Nobody else looks. If you forget your word, ask for the phone and peek again on the same screen.

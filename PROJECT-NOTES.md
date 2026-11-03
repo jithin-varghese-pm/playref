@@ -72,6 +72,8 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 
 - 3 Nov 2026: **Imposter added as game 2** (live at /#/imposter). Rules = Playref standard rules from the Imposter research (rules/imposter.md, 14 cards; 12 fights). One phone, hold-to-see cards that look identical, fair picking (never twice in a row, longer wait = better odds), starter never the imposter, 6 word packs (Kerala food, Malayalam films, Cricket, Bengaluru places, Bollywood, Everyday things). No AI in Imposter. Names avoided: Spyfall, The Chameleon, Undercover, Mr. White.
 
+- 3 Nov 2026: **Imposter changes (Jithin):** the imposter gets no category (rule I3 updated; category is now a house rule). Pack name hidden during play. New default pack "Surprise me" keeps even the category secret. Optional player names, remembered on the phone.
+
 ## Open decisions
 
 - Review of the design document.

@@ -90,18 +90,25 @@ export interface Round {
   starter: number;
 }
 
+/** "Surprise me": a random pack each round, never shown, so even the category stays secret (rule I3). */
+export const SURPRISE = 'surprise';
+
 export function dealRound(players: number, packId: string, fairness: Fairness, used: string[], rng: Rng = cryptoRng): Round {
   if (players < MIN_PLAYERS || players > MAX_PLAYERS) throw new Error(`Imposter needs ${MIN_PLAYERS} to ${MAX_PLAYERS} players`);
-  const pack = WORD_PACKS.find((p) => p.id === packId) ?? WORD_PACKS[0];
+  const pack =
+    packId === SURPRISE ? WORD_PACKS[Math.floor(rng() * WORD_PACKS.length)] : (WORD_PACKS.find((p) => p.id === packId) ?? WORD_PACKS[0]);
   const imposters = pickImposters(players, fairness, rng);
   return { players, packId: pack.id, category: pack.category, word: pickWord(pack, used, rng), imposters, starter: pickStarter(players, imposters, rng) };
 }
 
-/** What a player sees on their card (rule I3). Same shape for everyone so the layout never gives it away. */
-export function cardFor(round: Round, player: number): { title: string; main: string; category: string } {
+/**
+ * What a player sees on their card (rule I3). The imposter gets no word and no category.
+ * Every card has the same three lines so the layout never gives it away.
+ */
+export function cardFor(round: Round, player: number): { title: string; main: string; note: string } {
   return round.imposters.includes(player)
-    ? { title: 'YOU ARE THE', main: 'IMPOSTER', category: round.category }
-    : { title: 'YOUR WORD', main: round.word, category: round.category };
+    ? { title: 'YOU ARE THE', main: 'IMPOSTER', note: 'Blend in and find the word' }
+    : { title: 'YOUR WORD', main: round.word, note: "Don't say it out loud" };
 }
 
 /** Rule I14 points (optional). */
