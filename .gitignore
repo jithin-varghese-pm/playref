@@ -6,3 +6,5 @@ rules/reference/*.pdf
 shared/generated/
 *.log
 .env*
+research_notes/
+reports/

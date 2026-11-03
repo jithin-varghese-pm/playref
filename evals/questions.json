@@ -539,6 +539,14 @@
       "verdicts": [
         "NOT SURE"
       ]
+    },
+    {
+      "group": "reported",
+      "q": "What is flip?",
+      "verdicts": [
+        "NOT SURE"
+      ],
+      "label": "CLASSIC ONLY"
     }
   ]
 }

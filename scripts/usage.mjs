@@ -46,5 +46,13 @@ console.log(`Playref usage, last ${days} day(s), India dates from ${since}. Visi
 if (!rows.length) console.log('\nNo usage recorded yet.');
 else {
   for (const [day, list] of byDay) report(day, list);
-  if (byDay.size > 1) report(`TOTAL (${byDay.size} days)`, rows);
+  if (byDay.size > 1) {
+    // Add up the same action across days, so the total lists each one once.
+    const merged = new Map();
+    for (const r of rows) {
+      const k = `${r.event}|${r.key}`;
+      merged.set(k, { event: r.event, key: r.key, n: (merged.get(k)?.n ?? 0) + r.n });
+    }
+    report(`TOTAL (${byDay.size} days)`, [...merged.values()]);
+  }
 }

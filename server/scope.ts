@@ -31,6 +31,8 @@ export function classifyScope(question: string): Scope {
   if (containsAbuse(question)) return 'abuse';
   if (GREETING.test(text) || (ABOUT_BOT.test(text) && !UNO_WORDS.some((p) => has(text, p)))) return 'chitchat';
   if (OTHER_VERSIONS.some((p) => has(text, p))) return 'other-version';
+  // "Flip" on its own means UNO Flip ("what is flip?"), but "flip the first card" / "flipped over" is Classic.
+  if (/(^| )flip( (?!the |over|a |it|first)|$)/.test(text)) return 'other-version';
   if (OTHER_GAMES.some((p) => has(text, p)) && !UNO_WORDS.some((p) => has(text, p))) return 'not-uno';
   return 'in';
 }
