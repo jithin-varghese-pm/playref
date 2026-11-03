@@ -21,51 +21,47 @@ export function imposterCount(players: number): number {
   return players >= 7 ? 2 : 1;
 }
 
+/** Nobody is the imposter more than this many rounds in a row (rule I5). */
+export const MAX_IN_A_ROW = 2;
+
 /**
- * How many rounds each player has gone without being the imposter, and who was
+ * How many rounds in a row each player has just been the imposter, and who was
  * imposter last round. Lives on the phone between rounds.
  */
 export interface Fairness {
-  waits: number[];
+  streak: number[];
   last: number[];
 }
 
 export function freshFairness(players: number): Fairness {
-  return { waits: Array.from({ length: players }, () => 0), last: [] };
-}
-
-/** Picks one index with probability proportional to its weight. */
-function weightedPick(weights: number[], rng: Rng): number {
-  const total = weights.reduce((a, b) => a + b, 0);
-  let r = rng() * total;
-  for (let i = 0; i < weights.length; i++) {
-    r -= weights[i];
-    if (r < 0) return i;
-  }
-  return weights.length - 1;
+  return { streak: Array.from({ length: players }, () => 0), last: [] };
 }
 
 /**
- * Rule I5: fair random picking. Nobody who was imposter last round can be picked
- * this round, and the longer someone has waited, the more likely they are picked.
+ * Rule I5: plain random picking, everyone with the same chance, so nobody can be ruled out
+ * just because they were the imposter last round. The only limit: someone who has been the
+ * imposter MAX_IN_A_ROW rounds in a row sits out one round. No extra odds for whoever has
+ * waited longest, because that becomes a pattern players can read.
  */
 export function pickImposters(players: number, fairness: Fairness, rng: Rng): number[] {
   const count = imposterCount(players);
+  const all = Array.from({ length: players }, (_, i) => i);
+  let pool = all.filter((i) => (fairness.streak[i] ?? 0) < MAX_IN_A_ROW);
+  // At most `count` players can be on a full streak, and there are always more players than that,
+  // but never let a bad saved state leave too few to choose from.
+  if (pool.length < count) pool = all;
   const picked: number[] = [];
-  const blocked = new Set(fairness.last);
-  // With 3 players and 1 imposter there are always 2 others to choose from, so blocking never empties the pool.
-  const weights = Array.from({ length: players }, (_, i) => (blocked.has(i) ? 0 : 1 + (fairness.waits[i] ?? 0)));
   for (let k = 0; k < count; k++) {
-    const i = weightedPick(weights, rng);
-    picked.push(i);
-    weights[i] = 0;
+    const at = Math.floor(rng() * pool.length);
+    picked.push(pool[at]);
+    pool = pool.filter((_, j) => j !== at);
   }
   return picked.sort((a, b) => a - b);
 }
 
 export function updateFairness(players: number, fairness: Fairness, imposters: number[]): Fairness {
-  const waits = Array.from({ length: players }, (_, i) => (imposters.includes(i) ? 0 : (fairness.waits[i] ?? 0) + 1));
-  return { waits, last: imposters };
+  const streak = Array.from({ length: players }, (_, i) => (imposters.includes(i) ? (fairness.streak[i] ?? 0) + 1 : 0));
+  return { streak, last: imposters };
 }
 
 /** Picks a word from the pack, avoiding words already used tonight when possible. */

@@ -104,25 +104,30 @@ describe('Imposter bug-hunt fixes', () => {
 
   it.each([
     { fairness: {} },
-    { players: 5, fairness: { waits: [0, 0, 0, 0, 0], last: 3 } },
-    { players: 5, fairness: { waits: [0, 0, 0, 0, 0], last: [] }, used: 7 },
-    { players: 5, fairness: { waits: [0, 0, 0, 0, 0], last: [] }, names: [42] },
-    { players: 4.5, fairness: { waits: [], last: [] } },
-    { players: 5, packId: 'gone-pack', fairness: { waits: [0, 0, 0, 0, 0], last: [] } },
+    { players: 5, fairness: { streak: [0, 0, 0, 0, 0], last: 3 } },
+    { players: 5, fairness: { streak: [0, 0, 0, 0, 0], last: [] }, used: 7 },
+    { players: 5, fairness: { streak: [0, 0, 0, 0, 0], last: [] }, names: [42] },
+    { players: 4.5, fairness: { streak: [], last: [] } },
+    { players: 5, packId: 'gone-pack', fairness: { streak: [0, 0, 0, 0, 0], last: [] } },
   ])('broken saved data falls back safely (high #5): %j', (bad) => {
     localStorage.setItem(KEY, JSON.stringify(bad));
     const s = load();
     expect(Number.isInteger(s.players)).toBe(true);
-    expect(s.fairness.waits).toHaveLength(s.players);
+    expect(s.fairness.streak).toHaveLength(s.players);
     expect(['surprise', 'kerala-food', 'malayalam-films', 'cricket', 'bengaluru', 'bollywood', 'everyday']).toContain(s.packId);
     startGame(s.players);
     expect(screen.getByRole('button', { name: 'Time to vote' })).toBeTruthy();
   });
 
+  it('phones saved with the old fairness data carry over last round as a streak of 1', () => {
+    localStorage.setItem(KEY, JSON.stringify({ players: 5, fairness: { waits: [1, 0, 2, 1, 1], last: [1] } }));
+    expect(load().fairness).toEqual({ streak: [0, 1, 0, 0, 0], last: [1] });
+  });
+
   it('changing the player count keeps fairness (medium #6)', () => {
-    const f = resizeFairness({ waits: [2, 0, 1, 3, 1], last: [1] }, 6);
-    expect(f).toEqual({ waits: [2, 0, 1, 3, 1, 0], last: [1] });
-    expect(resizeFairness({ waits: [2, 0, 1, 3, 1], last: [4] }, 4).last).toEqual([]);
+    const f = resizeFairness({ streak: [0, 2, 0, 0, 0], last: [1] }, 6);
+    expect(f).toEqual({ streak: [0, 2, 0, 0, 0, 0], last: [1] });
+    expect(resizeFairness({ streak: [0, 0, 0, 0, 1], last: [4] }, 4).last).toEqual([]);
   });
 
   it('duplicate names get their seat number (medium #7)', () => {

@@ -49,10 +49,10 @@ export const MAX_NAME = 16;
 const PACK_IDS = new Set([SURPRISE, ...WORD_PACKS.map((p) => p.id)]);
 const isSeat = (n: unknown, players: number): n is number => Number.isInteger(n) && (n as number) >= 0 && (n as number) < players;
 
-/** Keeps what it can for a new player count: existing waits stay, new seats start at 0. */
+/** Keeps what it can for a new player count: existing streaks stay, new seats start at 0. */
 export function resizeFairness(f: Fairness, players: number): Fairness {
   return {
-    waits: Array.from({ length: players }, (_, i) => (Number.isFinite(f.waits[i]) && f.waits[i] >= 0 ? f.waits[i] : 0)),
+    streak: Array.from({ length: players }, (_, i) => (Number.isInteger(f.streak[i]) && f.streak[i] >= 0 ? f.streak[i] : 0)),
     last: f.last.filter((i) => isSeat(i, players)),
   };
 }
@@ -64,11 +64,11 @@ export function load(): Saved {
     const s = JSON.parse(localStorage.getItem(STORE) ?? 'null') as Record<string, unknown> | null;
     if (!s || typeof s !== 'object') return fresh;
     const players = Number.isInteger(s.players) && (s.players as number) >= MIN_PLAYERS && (s.players as number) <= MAX_PLAYERS ? (s.players as number) : 5;
-    const f = s.fairness as Partial<Fairness> | undefined;
-    const fairness =
-      f && Array.isArray(f.waits) && Array.isArray(f.last)
-        ? resizeFairness({ waits: f.waits.map(Number), last: f.last.filter((i) => isSeat(i, players)) }, players)
-        : freshFairness(players);
+    const f = s.fairness as (Partial<Fairness> & { waits?: unknown }) | undefined;
+    const last = f && Array.isArray(f.last) ? f.last.filter((i) => isSeat(i, players)) : [];
+    // Phones saved before 3 Nov 2026 have "waits" instead of "streak": last round's imposter starts on a streak of 1.
+    const streak = f && Array.isArray(f.streak) ? f.streak.map(Number) : Array.from({ length: players }, (_, i) => (last.includes(i) ? 1 : 0));
+    const fairness = f && Array.isArray(f.last) ? resizeFairness({ streak, last }, players) : freshFairness(players);
     return {
       players,
       packId: typeof s.packId === 'string' && PACK_IDS.has(s.packId) ? s.packId : SURPRISE,
@@ -156,7 +156,7 @@ export function Imposter() {
 
   function setPlayers(n: number) {
     const players = Math.max(MIN_PLAYERS, Math.min(MAX_PLAYERS, n));
-    // Keep fairness when the group grows or shrinks, so last round's imposter is still protected.
+    // Keep streaks when the group grows or shrinks, so the "max 2 in a row" limit still holds.
     setSaved((s) => ({ ...s, players, fairness: resizeFairness(s.fairness, players) }));
   }
 
@@ -287,7 +287,7 @@ export function Imposter() {
           <button type="button" className="ask-btn tap imp-start" onClick={start}>
             Start game
           </button>
-          <p className="imp-fair">Free. Fair: nobody is the imposter twice in a row.</p>
+          <p className="imp-fair">Free. Fair: nobody is the imposter more than twice in a row.</p>
         </section>
 
         <section className="fights">

@@ -115,8 +115,8 @@
       "button": true,
       "question": "Same guy is imposter again, is it rigged?",
       "verdict": "NO",
-      "line": "Playref never makes the same person imposter twice in a row, and favours people who have waited longest.",
-      "rules": "Pure random picking can give streaks, so Playref balances the picks across the night.",
+      "line": "No. It is random, so the same person can get it twice, but never more than twice in a row.",
+      "rules": "Every round is a fresh random pick with equal odds, so nobody is ruled out. The only limit: after 2 rounds in a row as the imposter, that player sits out one round.",
       "house": "None common.",
       "cards": [
         "I5"

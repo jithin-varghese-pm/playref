@@ -21,7 +21,7 @@ Official: Pass the phone to each player in turn. They hold the button to see the
 House: None common.
 
 ## I5: Who is the imposter
-Official: The app picks at random, but fairly: nobody is the imposter twice in a row, and people who have not been the imposter for a while are more likely to be picked.
+Official: The app picks at random, with everyone on the same chance every round, so being the imposter last round does not rule you out. The one limit: nobody is the imposter more than twice in a row.
 House: None common.
 
 ## I6: Clues

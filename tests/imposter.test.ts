@@ -9,6 +9,7 @@ import {
   pickWord,
   scoreRound,
   updateFairness,
+  MAX_IN_A_ROW,
   type Rng,
 } from '../shared/imposter/engine';
 import { WORD_PACKS } from '../shared/imposter/words';
@@ -59,32 +60,43 @@ describe('Imposter engine', () => {
     expect([7, 8, 9, 10].map(imposterCount)).toEqual([2, 2, 2, 2]);
   });
 
-  it('never picks the same imposter twice in a row (rule I5)', () => {
+  it('never picks anyone more than twice in a row, but does allow twice (rule I5)', () => {
     const rng = seeded(7);
     for (const players of [3, 4, 6, 7, 10]) {
       let f = freshFairness(players);
-      for (let r = 0; r < 200; r++) {
+      const run = Array.from({ length: players }, () => 0);
+      let doubles = 0;
+      for (let r = 0; r < 400; r++) {
         const imps = pickImposters(players, f, rng);
         expect(imps).toHaveLength(imposterCount(players));
         expect(new Set(imps).size).toBe(imps.length);
-        for (const i of imps) expect(f.last.includes(i), `players ${players} round ${r}`).toBe(false);
+        for (let i = 0; i < players; i++) run[i] = imps.includes(i) ? run[i] + 1 : 0;
+        expect(Math.max(...run), 'players ' + players + ' round ' + r).toBeLessThanOrEqual(MAX_IN_A_ROW);
+        if (imps.some((i) => f.last.includes(i))) doubles++;
         f = updateFairness(players, f, imps);
       }
+      // Last round's imposter is NOT ruled out: repeats really happen.
+      expect(doubles, 'players ' + players).toBeGreaterThan(10);
     }
   });
 
-  it('spreads the imposter role fairly over a long night', () => {
+  it('gives everyone the same chance over a long night', () => {
     const rng = seeded(42);
     const players = 5;
     const counts = Array.from({ length: players }, () => 0);
     let f = freshFairness(players);
-    for (let r = 0; r < 500; r++) {
+    for (let r = 0; r < 2000; r++) {
       const imps = pickImposters(players, f, rng);
       for (const i of imps) counts[i]++;
       f = updateFairness(players, f, imps);
     }
-    // Pure fairness would be 100 each. Allow a small spread.
-    for (const c of counts) expect(c).toBeGreaterThan(85), expect(c).toBeLessThan(115);
+    // Equal chance would be 400 each. Allow a normal random spread.
+    for (const c of counts) expect(c).toBeGreaterThan(330), expect(c).toBeLessThan(470);
+  });
+
+  it('a player on a streak of 2 sits out the next round', () => {
+    const f = { streak: [0, 2, 0, 0], last: [1] };
+    for (let s = 1; s < 50; s++) expect(pickImposters(4, f, seeded(s))).not.toContain(1);
   });
 
   it('never makes an imposter start the clues (rule I6)', () => {
