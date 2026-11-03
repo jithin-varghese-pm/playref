@@ -68,6 +68,8 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 
 - 2 Nov 2026: **Share link for LinkedIn: https://jithin-varghese-pm.github.io/playref/** (forwards to playref.pages.dev/?ref=li). LinkedIn's post editor showed "Cannot display preview" for every playref.pages.dev link even though Post Inspector rendered it; the github.io link worked first time. Use the github.io link for LinkedIn shares. Source: `portfolio-site/playref/` (update its og-image.jpg if the preview image changes).
 
+- 3 Nov 2026: **Group rulebook (research bet 1) dropped** by Jithin after the seamless design and the "how many groups" question. Mockups stay on the design canvas (Bet 1 row). Focus moves to adding games: Imposter or Mafia next.
+
 ## Open decisions
 
 - Review of the design document.
