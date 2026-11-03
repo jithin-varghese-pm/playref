@@ -45,7 +45,7 @@ Official: The accused player shows their card. If they are not an imposter, the 
 House: Some groups play with no last guess, so a caught imposter loses straight away.
 
 ## I11: Guessing early
-Official: An imposter may stop the game at any time and say "I'm the imposter, the word is ...". Right guess: the imposter wins. Wrong guess: the imposter loses. It cannot be taken back.
+Official: An imposter may stop the game at any time and say "I'm the imposter, the word is ...". Right guess: the imposters win. Wrong guess: that imposter is caught. If another imposter is still hidden, the group votes for them straight away, with no new clues (as in I13). It cannot be taken back.
 House: None common.
 
 ## I12: Saying the word by mistake

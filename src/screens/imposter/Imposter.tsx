@@ -210,11 +210,11 @@ export function Imposter() {
   function guessed(right: boolean, player: number, early: boolean) {
     if (!round) return;
     if (right) return finish(true, `${name(player)} guessed the word${early ? ' early' : ''}.`);
-    if (early) return finish(false, `${name(player)} guessed early and got it wrong.`);
     const nowCaught = [...caught, player];
     setCaught(nowCaught);
     const left = round.imposters.filter((i) => !nowCaught.includes(i));
-    if (left.length === 0) finish(false, `Every imposter was caught.`);
+    // A wrong early guess counts as a catch (rule I11); the group still has to find any other imposter.
+    if (left.length === 0) finish(false, early && round.imposters.length === 1 ? `${name(player)} guessed early and got it wrong.` : 'Every imposter was caught.');
     else setPhase({ name: 'vote', tie: false });
   }
 

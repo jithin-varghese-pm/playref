@@ -146,4 +146,20 @@ describe('Imposter bug-hunt fixes', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Yes, end it' }));
     expect(screen.getByRole('button', { name: 'Start game' })).toBeTruthy();
   });
+
+  it('with 2 imposters, a wrong early guess catches that one and the group votes for the other (rule I11)', () => {
+    startGame(7);
+    const [a, b] = imposters();
+    fireEvent.click(screen.getByRole('button', { name: 'Imposter guessing early' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Player ' + (a + 1) }));
+    fireEvent.pointerDown(screen.getByRole('button', { name: 'Hold to see your card' }));
+    fireEvent.pointerUp(screen.getByRole('button', { name: /YOU ARE AN IMPOSTER/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guess now' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guessed wrong' }));
+    expect(screen.queryByLabelText('Result')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'One more vote' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Player ' + (b + 1) }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guessed wrong' }));
+    expect(screen.getByLabelText('Result').textContent).toContain('The group wins!');
+  });
 });

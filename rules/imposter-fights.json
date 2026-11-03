@@ -9,8 +9,17 @@
       "line": "The tied players give one more clue, then everyone revotes between them. Still tied? The imposter wins.",
       "rules": "A tie means the group could not agree, so the tied players get one last chance to clear their name before the final vote.",
       "house": "Some groups do a straight revote, call it a draw, or give a tie to the imposter straight away.",
-      "cards": ["I9"],
-      "match": [["tie", "tied", "same votes", "equal votes"]]
+      "cards": [
+        "I9"
+      ],
+      "match": [
+        [
+          "tie",
+          "tied",
+          "same votes",
+          "equal votes"
+        ]
+      ]
     },
     {
       "id": "imp-said-word",
@@ -20,8 +29,19 @@
       "line": "The round is cancelled. Deal a new word and nobody scores.",
       "rules": "Saying the secret word, a form of it or a translation of it hands the imposter the answer, so the round cannot be played fairly.",
       "house": "Some groups just carry on.",
-      "cards": ["I12", "I6"],
-      "match": [["said the word", "said the actual word", "said the secret word", "told the word", "gave away the word"]]
+      "cards": [
+        "I12",
+        "I6"
+      ],
+      "match": [
+        [
+          "said the word",
+          "said the actual word",
+          "said the secret word",
+          "told the word",
+          "gave away the word"
+        ]
+      ]
     },
     {
       "id": "imp-language",
@@ -31,8 +51,21 @@
       "line": "Yes, in any language the whole group understands. But the word itself in another language counts as saying the word.",
       "rules": "Clues just need to hint at the word. Translating the secret word is the same as saying it.",
       "house": "Some groups agree on one language before they start.",
-      "cards": ["I6", "I12"],
-      "match": [["hindi", "malayalam", "tamil", "kannada", "language", "manglish", "hinglish"]]
+      "cards": [
+        "I6",
+        "I12"
+      ],
+      "match": [
+        [
+          "hindi",
+          "malayalam",
+          "tamil",
+          "kannada",
+          "language",
+          "manglish",
+          "hinglish"
+        ]
+      ]
     },
     {
       "id": "imp-bluff",
@@ -42,8 +75,20 @@
       "line": "You can bluff all you like. Only the card shown at the reveal counts.",
       "rules": "Anyone can bluff, ask questions or defend themselves during the talk. A non-imposter who pretends just risks being voted out.",
       "house": "None common.",
-      "cards": ["I7", "I10"],
-      "match": [["lie", "lying", "bluff", "pretend", "trick", "fake"]]
+      "cards": [
+        "I7",
+        "I10"
+      ],
+      "match": [
+        [
+          "lie",
+          "lying",
+          "bluff",
+          "pretend",
+          "trick",
+          "fake"
+        ]
+      ]
     },
     {
       "id": "imp-pass",
@@ -53,8 +98,17 @@
       "line": "No. Everyone must give a clue. If you're stuck, say something vague.",
       "rules": "Passing would let the imposter dodge the hardest moment, and it makes a normal player look guilty.",
       "house": "None common.",
-      "cards": ["I6"],
-      "match": [["pass", "skip my turn", "no clue", "skip a turn"]]
+      "cards": [
+        "I6"
+      ],
+      "match": [
+        [
+          "pass",
+          "skip my turn",
+          "no clue",
+          "skip a turn"
+        ]
+      ]
     },
     {
       "id": "imp-rigged",
@@ -64,8 +118,19 @@
       "line": "Playref never makes the same person imposter twice in a row, and favours people who have waited longest.",
       "rules": "Pure random picking can give streaks, so Playref balances the picks across the night.",
       "house": "None common.",
-      "cards": ["I5"],
-      "match": [["rigged", "again", "twice", "same person", "unfair", "always"]]
+      "cards": [
+        "I5"
+      ],
+      "match": [
+        [
+          "rigged",
+          "again",
+          "twice",
+          "same person",
+          "unfair",
+          "always"
+        ]
+      ]
     },
     {
       "id": "imp-vote",
@@ -75,19 +140,35 @@
       "line": "Yes. Everyone votes, the imposter included.",
       "rules": "On \"3, 2, 1\" everyone points at the same moment. The most votes is accused.",
       "house": "Some groups vote one by one.",
-      "cards": ["I8"],
-      "match": [["vote", "voting"]]
+      "cards": [
+        "I8"
+      ],
+      "match": [
+        [
+          "vote",
+          "voting"
+        ]
+      ]
     },
     {
       "id": "imp-early-guess",
       "button": false,
       "question": "Can the imposter guess the word before the vote?",
       "verdict": "YES",
-      "line": "Yes, once. They must say \"I'm the imposter, the word is ...\". Right wins, wrong loses.",
-      "rules": "An early guess ends the game straight away and cannot be taken back.",
+      "line": "Yes, once. They must say \"I'm the imposter, the word is ...\". Right wins; wrong means they are caught.",
+      "rules": "An early guess cannot be taken back. With two imposters, a wrong guess catches that one, and the group votes straight away for the other.",
       "house": "None common.",
-      "cards": ["I11"],
-      "match": [["guess early", "guess before", "early guess", "shout the word"]]
+      "cards": [
+        "I11"
+      ],
+      "match": [
+        [
+          "guess early",
+          "guess before",
+          "early guess",
+          "shout the word"
+        ]
+      ]
     },
     {
       "id": "imp-forgot",
@@ -97,8 +178,18 @@
       "line": "Yes. Ask for the phone and peek again on the same hold-to-see screen.",
       "rules": "The peek screen looks the same for everyone, so asking for it gives nothing away.",
       "house": "None common.",
-      "cards": ["I4"],
-      "match": [["forgot", "forget", "look again", "see again", "peek"]]
+      "cards": [
+        "I4"
+      ],
+      "match": [
+        [
+          "forgot",
+          "forget",
+          "look again",
+          "see again",
+          "peek"
+        ]
+      ]
     },
     {
       "id": "imp-phrase",
@@ -108,8 +199,18 @@
       "line": "One word. Some groups allow short phrases of up to 3 words, for kids and grandparents.",
       "rules": "One-word clues keep the imposter in the game and the round quick.",
       "house": "Short phrases of up to 3 words.",
-      "cards": ["I6"],
-      "match": [["one word", "phrase", "sentence", "two words", "more than one word"]]
+      "cards": [
+        "I6"
+      ],
+      "match": [
+        [
+          "one word",
+          "phrase",
+          "sentence",
+          "two words",
+          "more than one word"
+        ]
+      ]
     },
     {
       "id": "imp-two",
@@ -119,8 +220,18 @@
       "line": "The caught one makes a last guess, then you vote once more straight away to find the other. Catch both to win.",
       "rules": "With two imposters the group must catch both. Any imposter who escapes or guesses right wins for the imposters.",
       "house": "Some groups vote out one player per round until every imposter is out.",
-      "cards": ["I13"],
-      "match": [["two imposters", "2 imposters", "second imposter", "other imposter", "both imposters"]]
+      "cards": [
+        "I13"
+      ],
+      "match": [
+        [
+          "two imposters",
+          "2 imposters",
+          "second imposter",
+          "other imposter",
+          "both imposters"
+        ]
+      ]
     },
     {
       "id": "imp-early-accuse",
@@ -130,8 +241,17 @@
       "line": "You can talk any time, but voting only happens after the clue rounds.",
       "rules": "Clues first, then open talk, then the vote. Accusing early just gives the imposter more to work with.",
       "house": "None common.",
-      "cards": ["I8", "I7"],
-      "match": [["accuse", "before everyone", "early vote"]]
+      "cards": [
+        "I8",
+        "I7"
+      ],
+      "match": [
+        [
+          "accuse",
+          "before everyone",
+          "early vote"
+        ]
+      ]
     }
   ]
 }
