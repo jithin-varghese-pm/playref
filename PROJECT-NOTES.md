@@ -70,6 +70,8 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 
 - 3 Nov 2026: **Group rulebook (research bet 1) dropped** by Jithin after the seamless design and the "how many groups" question. Mockups stay on the design canvas (Bet 1 row). Focus moves to adding games: Imposter or Mafia next.
 
+- 3 Nov 2026: **Imposter added as game 2** (live at /#/imposter). Rules = Playref standard rules from the Imposter research (rules/imposter.md, 14 cards; 12 fights). One phone, hold-to-see cards that look identical, fair picking (never twice in a row, longer wait = better odds), starter never the imposter, 6 word packs (Kerala food, Malayalam films, Cricket, Bengaluru places, Bollywood, Everyday things). No AI in Imposter. Names avoided: Spyfall, The Chameleon, Undercover, Mr. White.
+
 ## Open decisions
 
 - Review of the design document.

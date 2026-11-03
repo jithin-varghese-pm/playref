@@ -1,6 +1,6 @@
 # Playref
 
-**An unofficial rules referee for road-trip games.** Game 1: the UNO card game (Classic rules).
+**An unofficial rules referee for road-trip games.** Game 1: the UNO card game (Classic rules). Game 2: Imposter, a one-phone word game with fair picking and Indian word packs.
 
 Mid-game fight? Tap it, or type it, and get a clear verdict in seconds: **YES**, **NO**, **HOUSE RULE**, **THE RULE** or **NOT SURE**, with what the rules say and how groups often play it.
 
@@ -42,7 +42,7 @@ People can report a bug or suggest an idea from any screen (and flag a specific 
 
 - React 18 + TypeScript + Vite
 - Cloudflare Pages + Pages Functions, Workers AI (free daily allocation), D1
-- Vitest (130 tests) and Testing Library
+- Vitest (145 tests) and Testing Library
 
 ```
 rules/            rule cards (source of truth) and known fights

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { IMPOSTER_CARDS } from '../../shared/generated/imposter-data';
 import { RULE_CARDS } from '../../shared/generated/rules-data';
 import { RULES_SHEET_URL, verdictWord } from '../../shared/rules';
 import { SparkIcon } from './Home';
@@ -32,7 +33,8 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
   const style =
     answer.label === 'FOUL!' ? CARD_STYLE['HOUSE RULE'] : answer.label === 'HELLO!' ? CARD_STYLE.RULE : CARD_STYLE[answer.verdict];
   const fromAi = answer.source === 'ai' || answer.source === 'saved';
-  const usedCards = RULE_CARDS.filter((c) => answer.cards.includes(c.id));
+  const isImposter = answer.game === 'imposter';
+  const usedCards = (isImposter ? IMPOSTER_CARDS : RULE_CARDS).filter((c) => answer.cards.includes(c.id));
 
   async function vote(correct: boolean) {
     setVoted(true);
@@ -100,9 +102,13 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
             ))}
           </ul>
         )}
-        <a href={RULES_SHEET_URL} target="_blank" rel="noreferrer">
-          Read Mattel's rules sheet
-        </a>
+        {isImposter ? (
+          <span className="imp-standard">Playref standard rules. Imposter has no official rulebook.</span>
+        ) : (
+          <a href={RULES_SHEET_URL} target="_blank" rel="noreferrer">
+            Read Mattel's rules sheet
+          </a>
+        )}
       </section>
 
       {answer.house && answer.house !== 'None common.' && (

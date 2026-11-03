@@ -1,3 +1,4 @@
+import { IMPOSTER_FIGHTS } from '../shared/generated/imposter-data';
 import { buttonFights } from '../shared/rules';
 import type { AskResponse } from '../shared/types';
 import type { Store } from './store';
@@ -7,7 +8,8 @@ import type { Store } from './store';
  * Only the events and keys listed here are accepted, so nobody can write junk.
  */
 const ALLOWED: Record<string, Set<string>> = {
-  tap: new Set(buttonFights.map((f) => f.id)),
+  tap: new Set([...buttonFights.map((f) => f.id), ...IMPOSTER_FIGHTS.map((f) => f.id)]),
+  game: new Set(['imposter-start', 'imposter-win', 'group-win', 'imposter-word-said']),
   share: new Set(['shared', 'copied', 'failed']),
   page: new Set(['about', 'accuracy']),
   vote: new Set(['yes', 'no']),

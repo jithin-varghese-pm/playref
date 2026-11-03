@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent } from 'react';
 import { buttonFights } from '../../shared/rules';
 import type { Fight } from '../../shared/types';
 import { Footer } from './Footer';
+import { GameTabs } from './GameTabs';
 
 
 const EXAMPLES = ['Can I play a Skip on a Reverse?', 'Who goes first?', 'Can I play a green 7 on a red 7?'];
@@ -45,6 +46,8 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
         </div>
         <div className="tagline">Unofficial rules referee</div>
       </header>
+
+      <GameTabs active="uno" />
 
       <form className="ask-hero" onSubmit={submit} aria-label="Ask the AI referee">
         <div className="ask-head">

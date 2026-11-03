@@ -20,6 +20,10 @@ Goal: real people use it, and we measure it honestly.
 
 **Decision point after "Now":** if people use it and ask about other games, start "Next". If not, stop building and add a "what I learned" section to the case study.
 
+## Shipped 3 Nov 2026: Imposter (game 2)
+
+One-phone word game with fair picking, Indian word packs and Imposter fights. Measure with `npm run usage` (Imposter games started and finished).
+
 ## Next: "What should we play?" picker + card-game referee
 
 Decided 2 Nov 2026, parked until "Now" is done.

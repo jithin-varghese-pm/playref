@@ -36,6 +36,8 @@ export interface Answer {
   label?: string;
   /** A short friendly line shown above the card, e.g. when the question came with swearing. */
   note?: string;
+  /** Which game the answer is about. Missing means UNO. */
+  game?: 'imposter';
 }
 
 export type AskResponse =

@@ -39,6 +39,8 @@ function report(title, list) {
   console.log(`  Typed questions: ${asks}${asks ? ` (${Math.round((noAi / asks) * 100)}% answered without AI)` : ''}`);
   for (const r of list.filter((r) => r.event === 'ask').sort((a, b) => b.n - a.n)) console.log(`    ${String(r.n).padStart(4)}  ${ASK_LABELS[r.key] ?? r.key}`);
   console.log(`  Shares: ${sum(list, 'share')}   Votes: ${list.filter((r) => r.event === 'vote' && r.key === 'yes').reduce((a, r) => a + r.n, 0)} right / ${list.filter((r) => r.event === 'vote' && r.key === 'no').reduce((a, r) => a + r.n, 0)} wrong`);
+  const g = (k) => list.filter((r) => r.event === 'game' && r.key === k).reduce((a, r) => a + r.n, 0);
+  console.log(`  Imposter games started: ${g('imposter-start')}   Group wins: ${g('group-win')}   Imposter wins: ${g('imposter-win')}   Cancelled (word said): ${g('imposter-word-said')}`);
   console.log(`  Opened About: ${list.filter((r) => r.event === 'page' && r.key === 'about').reduce((a, r) => a + r.n, 0)}   Opened Accuracy: ${list.filter((r) => r.event === 'page' && r.key === 'accuracy').reduce((a, r) => a + r.n, 0)}`);
 }
 
