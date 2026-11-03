@@ -18,18 +18,20 @@ export function SparkIcon() {
 
 interface Props {
   aiOff: boolean;
+  /** True while a typed question is being checked: the box and button are locked. */
+  busy?: boolean;
   notice: string | null;
   onPick: (f: Fight) => void;
   onAsk: (question: string) => void;
 }
 
-export function Home({ aiOff, notice, onPick, onAsk }: Props) {
+export function Home({ aiOff, busy = false, notice, onPick, onAsk }: Props) {
   const [q, setQ] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    if (q.trim() && !aiOff) onAsk(q.trim());
+    if (q.trim() && !aiOff && !busy) onAsk(q.trim());
   }
 
   return (
@@ -71,12 +73,15 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
           value={q}
           maxLength={300}
           disabled={aiOff}
+          readOnly={busy}
           placeholder={aiOff ? 'Resting until tomorrow' : 'e.g. My friend played a +4 but I think she had red'}
           onChange={(e) => setQ(e.target.value)}
           onKeyDown={(e) => {
+            // Enter while an Indian-language keyboard is still composing a word must not send.
+            if (e.nativeEvent.isComposing || e.keyCode === 229) return;
             if (e.key === 'Enter' && !e.shiftKey) {
               e.preventDefault();
-              if (q.trim() && !aiOff) onAsk(q.trim());
+              if (q.trim() && !aiOff && !busy) onAsk(q.trim());
             }
           }}
         />
@@ -99,7 +104,7 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
             ))}
           </div>
         )}
-        <button type="submit" className="ask-btn tap" disabled={aiOff || !q.trim()}>
+        <button type="submit" className="ask-btn tap" disabled={aiOff || busy || !q.trim()}>
           <SparkIcon />
           Ask the referee
         </button>

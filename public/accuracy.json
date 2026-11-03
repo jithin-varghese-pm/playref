@@ -1,7 +1,7 @@
 {
-  "ranAt": "2026-11-03T09:47:47.471Z",
+  "ranAt": "2026-11-03T12:00:41.300Z",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-  "rulesVersion": "9f5bf6d79331",
+  "rulesVersion": "5ea2e1906da1",
   "total": 56,
   "correct": 54,
   "misses": [

@@ -21,7 +21,7 @@ function fakeAi(reply: unknown = goodReply) {
 }
 
 // Matches no known fight, so it must go to step 2 or 3.
-const NEW_Q = 'who shuffles the cards between rounds';
+const NEW_Q = 'is there a time limit for each turn';
 
 describe('validateAiReply', () => {
   it('accepts a well-formed reply that cites real cards', () => {
@@ -240,10 +240,22 @@ describe('recordFeedback', () => {
     expect(await store.getSaved(key, RULES_VERSION)).not.toBeNull();
   });
 
-  it('keeps every vote for review', async () => {
+  it('keeps every vote for review, with the server copy of the answer', async () => {
     const store = new MemoryStore();
-    await recordFeedback({ key, question: NEW_Q, answer, correct: true, clientId: 'a', now: 2 }, store);
+    await store.saveAnswer(key, RULES_VERSION, answer, 1);
+    const forged = { ...answer, line: 'Forged by the browser' };
+    await recordFeedback({ key, question: NEW_Q, answer: forged, correct: true, clientId: 'a', now: 2 }, store);
     expect(store.feedback).toHaveLength(1);
     expect(store.feedback[0].correct).toBe(true);
+    expect(store.feedback[0].answer.line).toBe(answer.line);
+  });
+
+  it('ignores votes for answers that were never saved (no rows, no deletes)', async () => {
+    const store = new MemoryStore();
+    for (const id of ['a', 'b', 'c']) {
+      const r = await recordFeedback({ key: 'made up key', question: 'x', correct: false, clientId: id, now: 2 }, store);
+      expect(r.counted).toBe(false);
+    }
+    expect(store.feedback).toHaveLength(0);
   });
 });

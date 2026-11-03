@@ -6,7 +6,7 @@ import { MemoryStore } from '../server/store';
 import { validateAiReply } from '../server/validate';
 
 const good = { verdict: 'YES', line: 'You can challenge it.', rules: 'If they had the colour, they draw 4.', house: 'None common.', cards: ['R12'], on_topic: true };
-const NEW_Q = 'who shuffles the cards between rounds';
+const NEW_Q = 'is there a time limit for each turn';
 
 describe('abuse checker', () => {
   it.each(['fuck off', 'f u c k you', 'fuuuuck this', 'what a bitch', 'you chutiya', 'myre'])('flags "%s"', (t) => {

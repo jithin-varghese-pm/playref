@@ -1,6 +1,6 @@
 import { RULE_CARDS } from '../shared/generated/rules-data';
 import { normalize } from '../shared/normalize';
-import { containsAbuse, looksLikeLeak, stripLinks } from './abuse';
+import { answerIsRude, hasContactOrDomain, looksLikeLeak, stripLinks } from './abuse';
 import { VERDICTS, type Answer, type Verdict } from '../shared/types';
 
 const MAX_TEXT = 400;
@@ -85,7 +85,8 @@ export function validateAiReply(raw: unknown, question: string): Answer {
   const r = body as Record<string, unknown>;
 
   // The AI says the question is not about Classic UNO: answer like any other off-topic question.
-  if (r.on_topic === false) return offTopic(question);
+  // Anything other than a real true (false, 'false', missing) counts as off-topic.
+  if (r.on_topic !== true && r.on_topic !== undefined) return offTopic(question);
 
   const verdict = r.verdict as Verdict;
   if (!VERDICTS.includes(verdict)) return notSure(question);
@@ -96,7 +97,7 @@ export function validateAiReply(raw: unknown, question: string): Answer {
   const rules = text(r.rules) && stripLinks(text(r.rules)!);
   const house = (text(r.house) && stripLinks(text(r.house)!)) || 'None common.';
   if (!line || !rules) return notSure(question);
-  if ([line, rules, house].some((t) => containsAbuse(t) || looksLikeLeak(t))) return notSure(question);
+  if ([line, rules, house].some((t) => answerIsRude(t) || looksLikeLeak(t) || hasContactOrDomain(t))) return notSure(question);
 
   if (!Array.isArray(r.cards) || r.cards.length === 0) return notSure(question);
   const ids = new Set(RULE_CARDS.map((c) => c.id));

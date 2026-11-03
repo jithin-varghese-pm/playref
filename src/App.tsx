@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { fightToAnswer } from '../shared/rules';
 import type { Answer } from '../shared/types';
 import { ask, track } from './lib/api';
@@ -46,6 +46,8 @@ function useHashRoute() {
 export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
   const [screen, setScreen] = useState<Screen>({ name: 'home' });
   const [aiOff, setAiOff] = useState(false);
+  /** Counts asks, so only the newest question's answer is ever shown. */
+  const askId = useRef(0);
   const [notice, setNotice] = useState<string | null>(null);
   const hash = useHashRoute();
   const wide = useMediaQuery(WIDE_QUERY);
@@ -60,9 +62,12 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
   if (hash === '#/imposter') return <Imposter />;
 
   async function onAsk(question: string) {
+    const id = ++askId.current;
     setNotice(null);
     setScreen({ name: 'thinking' });
     const [res] = await Promise.all([ask(question), wait(minThinkMs)]);
+    // The player moved on (tapped a fight or asked again): a late answer must not replace what they see.
+    if (id !== askId.current) return;
     if (res.status === 'ok') {
       setScreen({ name: 'verdict', answer: res.answer, feedbackKey: res.feedbackKey });
       return;
@@ -80,7 +85,9 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
     <Home
       aiOff={aiOff}
       notice={notice}
+      busy={screen.name === 'thinking'}
       onPick={(f) => {
+        askId.current++;
         track('tap', f.id);
         setScreen({ name: 'verdict', answer: fightToAnswer(f), feedbackKey: null });
       }}

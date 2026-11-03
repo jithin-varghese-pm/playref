@@ -14,8 +14,11 @@ export interface FeedbackRow {
 
 /** Everything the server keeps. D1 in production, memory in tests. */
 export interface Store {
-  countHits(clientId: string, since: number): Promise<number>;
-  addHit(clientId: string, at: number): Promise<void>;
+  /**
+   * Records one attempt in a limit bucket, then counts the bucket. Recording first means
+   * requests sent at the same moment cannot all slip under the limit. True = allowed.
+   */
+  claim(bucket: string, limit: number, windowMs: number, now: number): Promise<boolean>;
   getSaved(key: string, version: string): Promise<Answer | null>;
   saveAnswer(key: string, version: string, answer: Answer, at: number): Promise<void>;
   /** Returns false when this person already voted on this answer. */
@@ -44,11 +47,9 @@ export class MemoryStore implements Store, ReportStore, GapStore {
   saved = new Map<string, { answer: Answer; no: number }>();
   feedback: FeedbackRow[] = [];
 
-  async countHits(clientId: string, since: number) {
-    return this.hits.filter((h) => h.clientId === clientId && h.at > since).length;
-  }
-  async addHit(clientId: string, at: number) {
-    this.hits.push({ clientId, at });
+  async claim(bucket: string, limit: number, windowMs: number, now: number) {
+    this.hits.push({ clientId: bucket, at: now });
+    return this.hits.filter((h) => h.clientId === bucket && h.at > now - windowMs).length <= limit;
   }
   async getSaved(key: string, version: string) {
     return this.saved.get(`${version}|${key}`)?.answer ?? null;
@@ -106,14 +107,12 @@ export class D1Store implements Store, ReportStore, GapStore {
       .run();
   }
 
-  async countHits(clientId: string, since: number) {
-    const row = await this.db.prepare('SELECT COUNT(*) AS n FROM rate_hits WHERE client_id = ? AND at > ?').bind(clientId, since).first<{ n: number }>();
-    return row?.n ?? 0;
-  }
-  async addHit(clientId: string, at: number) {
-    await this.db.prepare('INSERT INTO rate_hits (client_id, at) VALUES (?, ?)').bind(clientId, at).run();
-    // Keep the table small: hits older than two hours are never needed.
-    await this.db.prepare('DELETE FROM rate_hits WHERE at < ?').bind(at - 2 * 3_600_000).run();
+  async claim(bucket: string, limit: number, windowMs: number, now: number) {
+    await this.db.prepare('INSERT INTO rate_hits (client_id, at) VALUES (?, ?)').bind(bucket, now).run();
+    const row = await this.db.prepare('SELECT COUNT(*) AS n FROM rate_hits WHERE client_id = ? AND at > ?').bind(bucket, now - windowMs).first<{ n: number }>();
+    // Keep the table small (now and then, to save writes): hits older than a day are never needed.
+    if (Math.random() < 0.05) await this.db.prepare('DELETE FROM rate_hits WHERE at < ?').bind(now - 86_400_000).run();
+    return (row?.n ?? 0) <= limit;
   }
   async getSaved(key: string, version: string) {
     const row = await this.db

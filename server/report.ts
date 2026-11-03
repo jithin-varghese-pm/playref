@@ -1,3 +1,4 @@
+import { cleanText } from './http';
 /** In-app "Report a bug or suggest an idea" form. */
 
 export const REPORT_TYPES = ['bug', 'idea', 'other'] as const;
@@ -25,9 +26,10 @@ export interface ReportStore {
 
 const PAGES = new Set(['home', 'verdict', 'about', 'accuracy']);
 
-function clean(v: unknown, max: number): string | null {
+/** Trims, cuts to length and removes control characters (so nothing can mess with a terminal later). */
+function clean(v: unknown, max: number, keepNewlines = false): string | null {
   if (typeof v !== 'string') return null;
-  const t = v.trim();
+  const t = cleanText(v, keepNewlines).trim();
   return t ? t.slice(0, max) : null;
 }
 
@@ -37,7 +39,7 @@ export function parseReport(body: Record<string, unknown>): ReportInput | { erro
   if (typeof body.website === 'string' && body.website.trim()) return { error: 'spam' };
   const type = body.type as ReportType;
   if (!REPORT_TYPES.includes(type)) return { error: 'Pick bug, idea or other.' };
-  const message = clean(body.message, 2000);
+  const message = clean(body.message, 2000, true);
   if (!message || message.length < 5) return { error: 'Tell us a little more (at least 5 characters).' };
   return {
     type,

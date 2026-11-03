@@ -14,14 +14,14 @@ export interface AccuracyReport {
 }
 
 export function Accuracy() {
-  const [report, setReport] = useState<AccuracyReport | null | 'none'>(null);
+  const [report, setReport] = useState<AccuracyReport | null | 'none' | 'failed'>(null);
 
   useEffect(() => {
     track('page', 'accuracy');
     fetch('/accuracy.json')
-      .then((r) => (r.ok ? r.json() : 'none'))
-      .then((d: AccuracyReport | 'none') => setReport(d && typeof d === 'object' && 'total' in d ? d : 'none'))
-      .catch(() => setReport('none'));
+      .then((r) => (r.ok ? r.json() : r.status === 404 ? 'none' : 'failed'))
+      .then((d: AccuracyReport | 'none' | 'failed') => setReport(d && typeof d === 'object' && 'total' in d ? d : d === 'none' ? 'none' : 'failed'))
+      .catch(() => setReport('failed'));
   }, []);
 
   return (
@@ -42,7 +42,8 @@ export function Accuracy() {
 
       {report === null && <p className="detail-p">Loading...</p>}
       {report === 'none' && <p className="detail-p">No test run yet.</p>}
-      {report && report !== 'none' && (
+      {report === 'failed' && <p className="detail-p">Could not load the scores. Check your connection and try again.</p>}
+      {report && typeof report === 'object' && (
         <>
           <div className="score-row">
             <section className="score-card" aria-label="Accuracy score">

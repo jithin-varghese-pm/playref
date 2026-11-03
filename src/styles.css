@@ -304,8 +304,8 @@ a.cta-btn, a.cta-btn:hover { color: var(--ink); }
 @media (min-width: 900px) {
   .desk {
     display: grid;
-    grid-template-columns: minmax(400px, 500px) minmax(0, 1fr);
-    gap: 56px;
+    grid-template-columns: minmax(380px, 500px) minmax(330px, 1fr);
+    gap: clamp(24px, 4vw, 56px);
     max-width: 1180px;
     margin: 0 auto;
     padding: 0 40px;
@@ -361,3 +361,19 @@ a.cta-btn, a.cta-btn:hover { color: var(--ink); }
   .verdict-card { transform: rotate(-4deg); }
   .tap, .tap:hover, .tap:active { transition: none; transform: none; }
 }
+
+/* Bug-hunt fixes (3 Nov 2026) */
+/* Yellow on red is 4.03:1, below the 4.5:1 needed for small text. Small text on red uses white; big text keeps the yellow. */
+.footer a, .footer-link, .wrong-link, .about-kicker, .screen > .more-link, .fights .more-link { color: var(--paper); }
+.footer a:hover, .wrong-link:hover { color: var(--sun); }
+/* Long single-word names and words never run off a small phone. */
+.pass-to strong, .word-reveal strong, .player-btn, .imp-result-name, .imp-title, .verdict-q { overflow-wrap: anywhere; }
+/* Bigger tap targets (44px). */
+.example, .pack { min-height: 44px; }
+.more-link { min-height: 44px; display: inline-flex; align-items: center; }
+.footer-link { display: inline-block; padding: 8px 0; }
+/* End round, on every round screen. */
+.imp-quit { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 16px; margin-top: 4px; font-size: 14px; }
+.imp-dark .imp-quit, .imp-dark .imp-quit .more-link { color: var(--paper); }
+.imp-dark .imp-two { margin-top: 8px; }
+.imp-next:disabled { background: rgba(0, 0, 0, 0.35); color: var(--paper); }

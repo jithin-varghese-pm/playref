@@ -1,36 +1,34 @@
 import { clientIdFrom } from '../../server/client';
 import { recordFeedback } from '../../server/feedback';
+import { addressKey, readJsonBody } from '../../server/http';
 import { D1Store, type D1Like } from '../../server/store';
-import { VERDICTS, type Answer } from '../../shared/types';
 
 interface Env {
   DB: D1Database;
   ID_SALT?: string;
 }
 
-function isAnswer(a: unknown): a is Answer {
-  if (!a || typeof a !== 'object') return false;
-  const r = a as Record<string, unknown>;
-  return VERDICTS.includes(r.verdict as Answer['verdict']) && typeof r.line === 'string' && Array.isArray(r.cards);
-}
+/** Per person per hour. A real player votes a few times at most. */
+const VOTES_PER_HOUR = 30;
 
 export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
-  let body: Record<string, unknown>;
+  const read = await readJsonBody(request);
+  if (!read.ok) return Response.json({ ok: false }, { status: read.status });
+  const { feedbackKey, question, correct } = read.body;
+  if (typeof feedbackKey !== 'string' || feedbackKey.length < 1 || feedbackKey.length > 300 || typeof question !== 'string' || typeof correct !== 'boolean') {
+    return Response.json({ ok: false }, { status: 400 });
+  }
   try {
-    body = (await request.json()) as Record<string, unknown>;
+    const store = new D1Store(env.DB as unknown as D1Like);
+    const id = await clientIdFrom(addressKey(request.headers.get('CF-Connecting-IP') ?? 'unknown'), env.ID_SALT ?? 'playref');
+    const now = Date.now();
+    if (!(await store.claim(`fb:${id}`, VOTES_PER_HOUR, 3_600_000, now))) return Response.json({ ok: true, counted: false });
+    const { counted } = await recordFeedback({ key: feedbackKey, question, correct, clientId: id, now }, store);
+    return Response.json({ ok: true, counted });
   } catch {
-    return Response.json({ ok: false }, { status: 400 });
+    return Response.json({ ok: false }, { status: 503 });
   }
-  const { feedbackKey, question, answer, correct } = body;
-  if (typeof feedbackKey !== 'string' || feedbackKey.length > 300 || typeof question !== 'string' || typeof correct !== 'boolean' || !isAnswer(answer)) {
-    return Response.json({ ok: false }, { status: 400 });
-  }
-  if (JSON.stringify(answer).length > 4000) return Response.json({ ok: false }, { status: 413 });
-
-  const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
-  const { counted } = await recordFeedback(
-    { key: feedbackKey, question, answer, correct, clientId: await clientIdFrom(ip, env.ID_SALT ?? 'playref'), now: Date.now() },
-    new D1Store(env.DB as unknown as D1Like),
-  );
-  return Response.json({ ok: true, counted });
 };
+
+/** Only POST is supported. Other methods get JSON 405 instead of the app page. */
+export const onRequestGet: PagesFunction = async () => Response.json({ error: 'Use POST.' }, { status: 405, headers: { Allow: 'POST' } });

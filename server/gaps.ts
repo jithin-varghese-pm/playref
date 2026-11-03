@@ -1,4 +1,5 @@
 import type { AskResponse } from '../shared/types';
+import { cleanText } from './http';
 
 /** Which unanswered questions are worth keeping, and under what name. Abuse, unsafe and greetings are never kept. */
 export function gapOutcome(r: AskResponse): 'not_sure' | 'classic_only' | 'uno_only' | null {
@@ -11,9 +12,13 @@ export function gapOutcome(r: AskResponse): 'not_sure' | 'classic_only' | 'uno_o
 
 /** Blanks out anything that could identify someone: emails, phone numbers and long digit runs. */
 export function scrub(question: string): string {
-  return question
-    .replace(/[\w.+-]+@[\w-]+\.[\w.]+/g, '[email]')
-    .replace(/\+?\d[\d\s-]{6,}\d/g, '[number]')
+  return cleanText(question.normalize('NFKC'))
+    .replace(/[\w.+-]+@[\w-]+(?:\.[\w-]+)+/gu, '[email]')
+    .replace(/\b[\w.+-]+\s+(?:at|\[at\])\s+[\w-]+\s+(?:dot|\[dot\])\s+\w+/giu, '[email]')
+    .replace(/\+?\(?\p{Nd}[\p{Nd}\s().-]{6,}\p{Nd}/gu, '[number]')
+    .replace(/(^|\s)@[\w.]{2,}/gu, '$1[handle]')
+    .replace(/\s{2,}/g, ' ')
+    .trim()
     .slice(0, 300);
 }
 

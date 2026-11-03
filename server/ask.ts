@@ -12,6 +12,8 @@ import { notSure, validateAiReply } from './validate';
 
 export const RATE_LIMIT_PER_HOUR = 10;
 export const MAX_QUESTION_LENGTH = 300;
+/** Saved-answer keys shorter than this (letters and digits only) are never saved or reused. */
+export const MIN_KEY_LENGTH = 4;
 const HOUR = 3_600_000;
 
 export interface AiRunner {
@@ -86,6 +88,11 @@ const SCOPE_ANSWERS: Record<Blocked, Omit<Answer, 'question'>> = {
 };
 
 function scopeAnswer(question: string, kind: Blocked): Answer {
+  if (kind === 'abuse' || kind === 'unsafe') {
+    // Never repeat swearing or unsafe text back: the card can be shared under the Playref name.
+    const cleaned = removeAbuse(question);
+    question = cleaned && !containsAbuse(cleaned) && kind === 'abuse' ? cleaned : '(removed)';
+  }
   return { question, ...SCOPE_ANSWERS[kind] };
 }
 
@@ -108,12 +115,16 @@ export async function askQuestion(input: AskInput, deps: AskDeps): Promise<AskRe
   const question = input.question.trim();
   if (!question) return { status: 'error', message: 'Type a question first.' };
   if (question.length > MAX_QUESTION_LENGTH) return { status: 'error', message: 'Keep it under 300 characters.' };
+  // Emoji, punctuation or invisible characters only: nothing to answer, and no AI spent on it.
+  if (!normalize(question)) return { status: 'error', message: 'Type a question first.' };
 
   if (containsAbuse(question)) {
     const cleaned = removeAbuse(question);
-    if (!cleaned || !hasGameWords(cleaned)) return { status: 'ok', answer: scopeAnswer(question, 'abuse'), feedbackKey: null };
+    // The FOUL! card never repeats the swearing back (it could be shared under the Playref name).
+    if (!cleaned || !hasGameWords(cleaned)) return { status: 'ok', answer: scopeAnswer(cleaned || '(removed)', 'abuse'), feedbackKey: null };
     const res = await answerQuestion(cleaned, input, deps);
-    return res.status === 'ok' ? { ...res, answer: { ...res.answer, note: COOL_DOWN_NOTE } } : res;
+    // The friendly note only goes on real answers, never on blocked or off-topic cards.
+    return res.status === 'ok' && !res.answer.label && res.answer.source !== 'scope' ? { ...res, answer: { ...res.answer, note: COOL_DOWN_NOTE } } : res;
   }
   return answerQuestion(question, input, deps);
 }
@@ -128,18 +139,29 @@ async function answerQuestion(question: string, input: AskInput, deps: AskDeps):
   if (fight) return { status: 'ok', answer: fightToAnswer(fight, question), feedbackKey: null };
 
   // Step 2: a saved answer for the same question under the current rules, no AI.
+  // The key keeps letters of every script, so different questions never share an answer.
+  // Very short keys (emoji, punctuation, one letter) are never saved or reused.
   const key = normalize(question);
-  if (!input.evalMode) {
-    const saved = await deps.store.getSaved(key, RULES_VERSION);
-    if (saved) return { status: 'ok', answer: { ...saved, question, source: 'saved' }, feedbackKey: key };
+  const cacheable = key.replace(/ /g, '').length >= MIN_KEY_LENGTH;
+  if (!input.evalMode && cacheable) {
+    try {
+      const saved = await deps.store.getSaved(key, RULES_VERSION);
+      if (saved) return { status: 'ok', answer: { ...saved, question, source: 'saved' }, feedbackKey: key };
+    } catch {
+      // Database trouble: carry on without saved answers.
+    }
   }
 
   // The hourly limit only counts questions that are about to use AI.
   // Known fights, saved answers and blocked messages cost nothing, so they never use it up.
   if (!input.evalMode) {
-    const recent = await deps.store.countHits(input.clientId, input.now - HOUR);
-    if (recent >= RATE_LIMIT_PER_HOUR) return { status: 'rate_limited' };
-    await deps.store.addHit(input.clientId, input.now);
+    let allowed = true;
+    try {
+      allowed = await deps.store.claim(`ai:${input.clientId}`, RATE_LIMIT_PER_HOUR, HOUR, input.now);
+    } catch {
+      allowed = false; // If the limit cannot be checked, do not spend AI.
+    }
+    if (!allowed) return { status: 'rate_limited' };
   }
 
   // Step 3: the AI, with the whole rules file.
@@ -158,8 +180,12 @@ async function answerQuestion(question: string, input: AskInput, deps: AskDeps):
     else return { status: 'error', message: 'Something went wrong. Try again in a moment.' };
   }
 
-  if (answer.verdict !== 'NOT SURE' && !input.evalMode) {
-    await deps.store.saveAnswer(key, RULES_VERSION, answer, input.now);
+  if (answer.verdict !== 'NOT SURE' && !input.evalMode && cacheable) {
+    try {
+      await deps.store.saveAnswer(key, RULES_VERSION, answer, input.now);
+    } catch {
+      // Saving is a bonus; the player still gets the answer.
+    }
   }
-  return { status: 'ok', answer, feedbackKey: answer.verdict === 'NOT SURE' ? null : key };
+  return { status: 'ok', answer, feedbackKey: answer.verdict === 'NOT SURE' || !cacheable ? null : key };
 }

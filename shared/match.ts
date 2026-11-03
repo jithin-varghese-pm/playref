@@ -21,10 +21,19 @@ export function hasGameWords(question: string): boolean {
   return GAME_WORDS.some((w) => hits(text, w));
 }
 
-/** A phrase hits when it appears at the start of a word (so "stack" also hits "stacking"). */
+/**
+ * A phrase hits when it appears as whole words, allowing common endings
+ * ("stack" hits "stacks", "stacked", "stacking"), but not inside other words
+ * ("hand" does not hit "handsome", "on" does not hit "only").
+ */
 function hits(text: string, phrase: string): boolean {
-  return new RegExp(`(?:^| )${escape(normalize(phrase))}`).test(text);
+  const p = escape(normalize(phrase));
+  // Endings may double the last letter ("swap" -> "swapping", "stop" -> "stopped").
+  return new RegExp(`(?:^| )${p}(?:s|es|e?d|\\p{L}?ing|\\p{L}?ed|\\p{L}?ers?)?(?= |$)`, 'u').test(text);
 }
+
+/** Fights matched by a single word only answer short questions; longer ones go on to step 2 and the AI. */
+const SINGLE_GROUP_MAX_WORDS = 8;
 
 /**
  * Step 1 of the ask path. Returns the known fight only when EVERY match group
@@ -38,8 +47,10 @@ export function matchFight(question: string, fights: Fight[] = FIGHTS): Fight | 
   // A known fight only matches a question that is clearly about a card game.
   // Without this, "Who will win the next election?" matched "How do you win UNO?".
   if (!GAME_WORDS.some((w) => hits(text, w))) return null;
+  const words = text.split(' ').length;
   let best: Fight | null = null;
   for (const f of fights) {
+    if (f.match.length === 1 && words > SINGLE_GROUP_MAX_WORDS) continue;
     const all = f.match.every((group) => group.some((p) => hits(text, p)));
     if (all && (!best || f.match.length > best.match.length)) best = f;
   }

@@ -18,7 +18,7 @@ Questions about other UNO versions (No Mercy, Flip...) or other games are caught
 
 ## Guardrails
 
-Five layers, each measured by a red-team test set (21 attacks and look-alikes, scored on the Accuracy page):
+Five layers, each measured by a red-team test set (22 attacks and look-alikes, scored on the Accuracy page):
 
 1. **Before any AI call:** abuse (including spaced-out and stretched spellings) gets a FOUL! card, greetings get a friendly intro, and other UNO versions or other games are caught. Known fights only match questions that are clearly about a card game.
 2. **Safety model:** Cloudflare's Llama Guard 3 checks every question that would reach the main AI. Anything unsafe gets NOT HERE.
@@ -42,7 +42,7 @@ People can report a bug or suggest an idea from any screen (and flag a specific 
 
 - React 18 + TypeScript + Vite
 - Cloudflare Pages + Pages Functions, Workers AI (free daily allocation), D1
-- Vitest (145 tests) and Testing Library
+- Vitest (235 tests) and Testing Library
 
 ```
 rules/            rule cards (source of truth) and known fights

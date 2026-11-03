@@ -74,9 +74,13 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 
 - 3 Nov 2026: **Imposter changes (Jithin):** the imposter gets no category (rule I3 updated; category is now a house rule). Pack name hidden during play. New default pack "Surprise me" keeps even the category secret. Optional player names, remembered on the phone.
 
+- 3 Nov 2026: **Deep bug hunt** (server, app/UI, live site). Fixed: saved answers no longer shared between Hindi/Malayalam questions; hourly AI limit holds under parallel requests; database trouble never breaks answers; votes only count for real saved answers; other websites, non-JSON and huge requests are refused; rude, link, email and phone text from the AI is rejected; swear filter catches spaced and swapped letters but no longer flags "poori"; FOUL! cards never repeat the swearing; fewer wrong "known fight" matches; security and cache headers. Imposter: the word is never shown before the result (second imposter could see it); early guess is checked privately on the phone; hold card locks the next button; rounds survive tab switches; broken saved data cannot crash the game; fairness kept when the player count changes; duplicate names get seat numbers; End round and Back to the clues on every round screen. Small text on red changed from yellow to white for contrast. Scores unchanged: 54/56 accuracy, 22/22 safety.
+
 ## Open decisions
 
 - Review of the design document.
+- Imposter: when one of 2 imposters guesses early and is wrong, should the game end as a group win (now) or go on to a vote for the other imposter?
+- Imposter: should "Someone said the word, deal again" undo the fairness count for the cancelled round?
 
 ## Sources
 

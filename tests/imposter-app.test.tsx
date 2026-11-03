@@ -10,6 +10,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
   window.location.hash = '';
   localStorage.clear();
+  sessionStorage.clear();
 });
 
 function imposters(): number[] {
@@ -52,7 +53,8 @@ describe('Imposter game', () => {
     const imp = imposters()[0];
     fireEvent.click(screen.getByRole('button', { name: `Player ${imp + 1}` }));
     expect(screen.getByRole('heading', { name: `Player ${imp + 1} is an imposter` })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: /Show the word/ }));
+    // The word is never shown before the result.
+    expect(screen.queryByText(/The word was/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Guessed wrong' }));
     expect(screen.getByLabelText('Result').textContent).toContain('The group wins!');
   });
@@ -103,6 +105,8 @@ describe('Imposter game', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Time to vote' }));
     expect(screen.getByRole('button', { name: 'Manisha' })).toBeTruthy();
     unmount();
+    // A round in progress comes back after a reload; end it to check the setup screen.
+    sessionStorage.clear();
     // Names are remembered for next time.
     render(<App minThinkMs={0} />);
     expect((screen.getByLabelText('Name for player 2') as HTMLInputElement).value).toBe('Manisha');
