@@ -2,6 +2,8 @@ import { askQuestion, type AiRunner } from '../../server/ask';
 import { clientIdFrom } from '../../server/client';
 import { D1Store, type D1Like } from '../../server/store';
 import { askOutcome, countEvent } from '../../server/usage';
+import { gapOutcome, scrub } from '../../server/gaps';
+import { RULES_VERSION } from '../../shared/generated/rules-data';
 
 interface Env {
   AI: Ai;
@@ -39,5 +41,9 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env, waitUnti
   );
   // Usage counter: how typed questions were handled. Test runs are not counted.
   if (!evalMode) waitUntil(countEvent(store, 'ask', askOutcome(result), now).catch(() => {}));
+  // Gap finder: keep the text of questions Playref could not answer (scrubbed, nothing about the person).
+  const gap = gapOutcome(result);
+  // Uses the answer's copy of the question, which already has any swearing removed.
+  if (!evalMode && gap && result.status === 'ok') waitUntil(store.addUnanswered(scrub(result.answer.question), gap, RULES_VERSION, now).catch(() => {}));
   return Response.json(result, { headers: { 'Cache-Control': 'no-store' } });
 };

@@ -34,7 +34,7 @@ Players can also mark AI answers right or wrong. Three "No" votes remove a saved
 
 ## Measuring use
 
-Cloudflare Web Analytics counts visitors (no cookies). A small usage counter in D1 keeps daily totals of in-app actions (fight taps, how typed questions were answered, shares, votes), never who did them. `npm run usage` prints the summary.
+Cloudflare Web Analytics counts visitors (no cookies). A small usage counter in D1 keeps daily totals of in-app actions (fight taps, how typed questions were answered, shares, votes), never who did them. `npm run usage` prints the summary. `npm run gaps` lists questions Playref could not answer (AI NOT SURE, other UNO versions, other games), with phone numbers and emails blanked and nothing about the person, so the common ones can become new checked answers. The app tells users this under the Ask button.
 
 People can report a bug or suggest an idea from any screen (and flag a specific answer from the verdict screen). Messages land in D1; `npm run feedback` lists new ones and `npm run feedback -- --done <id>` marks one as handled. A hidden honeypot field and a 5-an-hour limit keep spam out.
 
@@ -42,7 +42,7 @@ People can report a bug or suggest an idea from any screen (and flag a specific 
 
 - React 18 + TypeScript + Vite
 - Cloudflare Pages + Pages Functions, Workers AI (free daily allocation), D1
-- Vitest (119 tests) and Testing Library
+- Vitest (130 tests) and Testing Library
 
 ```
 rules/            rule cards (source of truth) and known fights

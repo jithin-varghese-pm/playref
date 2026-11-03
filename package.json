@@ -12,7 +12,8 @@
     "typecheck": "npm run rules && tsc -b",
     "eval": "node evals/run.mjs",
     "usage": "node scripts/usage.mjs",
-    "feedback": "node scripts/feedback.mjs"
+    "feedback": "node scripts/feedback.mjs",
+    "gaps": "node scripts/gaps.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",

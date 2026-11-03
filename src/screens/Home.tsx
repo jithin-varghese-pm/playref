@@ -100,6 +100,7 @@ export function Home({ aiOff, notice, onPick, onAsk }: Props) {
           <SparkIcon />
           Ask the referee
         </button>
+        <p className="privacy-note">Questions Playref can't answer are saved without anything about you, so they can be added later.</p>
         {aiOff && (
           <p className="notice" role="status">
             Typed questions are back tomorrow. Tap a common fight below.

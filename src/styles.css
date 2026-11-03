@@ -143,6 +143,7 @@ button { font: inherit; }
 .score-row .score span { font-size: 24px; }
 .score-date { margin: 0; font-size: 13px; color: var(--soft); }
 
+.privacy-note { margin: -4px 0 0; font-size: 12px; line-height: 1.4; color: #4a4a4a; }
 .cool-note { align-self: flex-start; padding: 8px 14px; border-radius: 999px; background: var(--sun); color: var(--ink); font-size: 14px; font-weight: 700; }
 
 .footer { margin-top: auto; display: flex; flex-direction: column; gap: 8px; font-size: 11px; line-height: 1.5; color: var(--soft); }

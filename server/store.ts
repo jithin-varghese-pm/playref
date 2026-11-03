@@ -1,4 +1,5 @@
 import type { Answer } from '../shared/types';
+import type { GapStore } from './gaps';
 import type { ReportRow, ReportStore } from './report';
 
 export interface FeedbackRow {
@@ -26,7 +27,11 @@ export interface Store {
   bump(day: string, event: string, key: string): Promise<void>;
 }
 
-export class MemoryStore implements Store, ReportStore {
+export class MemoryStore implements Store, ReportStore, GapStore {
+  unanswered: { question: string; outcome: string }[] = [];
+  async addUnanswered(question: string, outcome: string) {
+    this.unanswered.push({ question, outcome });
+  }
   reports: ReportRow[] = [];
   async countReports(clientId: string, since: number) {
     return this.reports.filter((r) => r.clientId === clientId && r.at > since).length;
@@ -83,8 +88,12 @@ export interface D1Like {
   };
 }
 
-export class D1Store implements Store, ReportStore {
+export class D1Store implements Store, ReportStore, GapStore {
   constructor(private db: D1Like) {}
+
+  async addUnanswered(question: string, outcome: string, version: string, at: number) {
+    await this.db.prepare('INSERT INTO unanswered (at, question, outcome, rules_version) VALUES (?, ?, ?, ?)').bind(at, question, outcome, version).run();
+  }
 
   async countReports(clientId: string, since: number) {
     const row = await this.db.prepare('SELECT COUNT(*) AS n FROM reports WHERE client_id = ? AND at > ?').bind(clientId, since).first<{ n: number }>();
