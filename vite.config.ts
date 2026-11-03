@@ -1,6 +1,8 @@
 import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { IncomingMessage } from 'node:http';
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { askQuestion } from './server/ask';
 import { recordFeedback } from './server/feedback';
 import { submitReport } from './server/report';
@@ -66,6 +68,24 @@ function localApi(): Plugin {
   };
 }
 
+/** Files from public/ the offline worker saves on the first visit, next to the built code and styles. */
+const OFFLINE_PUBLIC = ['/', '/favicon.svg', '/mbm-logo.png', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/fonts/inter-latin.woff2', '/fonts/barlow-condensed-800-italic-latin.woff2'];
+
+/** Build only: writes sw.js with the exact files of this build, so the app opens with no signal. */
+function offlineWorker(): Plugin {
+  return {
+    name: 'playref-offline-worker',
+    apply: 'build',
+    generateBundle(_options, bundle) {
+      const built = Object.keys(bundle).filter((f) => /\.(js|css|woff2?|png|svg)$/.test(f)).map((f) => '/' + f);
+      const files = [...OFFLINE_PUBLIC, ...built.sort()];
+      const version = createHash('sha256').update(files.join('|')).digest('hex').slice(0, 12);
+      const source = readFileSync('scripts/sw.template.js', 'utf8').replace('__VERSION__', version).replace('__PRECACHE__', JSON.stringify(files));
+      this.emitFile({ type: 'asset', fileName: 'sw.js', source });
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), localApi()],
+  plugins: [react(), localApi(), offlineWorker()],
 });

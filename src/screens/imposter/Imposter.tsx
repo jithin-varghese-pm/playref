@@ -232,7 +232,7 @@ export function Imposter() {
         <GameTabs active="imposter" />
         <section className="imp-card">
           <h1 className="display imp-title">Who's the imposter?</h1>
-          <p className="imp-sub">Everyone gets the same secret word, except the imposter. Give one-word clues, then find the faker. Works in the car.</p>
+          <p className="imp-sub">Everyone gets the same secret word, except the imposter. Give one-word clues, then find the faker. Works in the car, even with no signal once you have opened it here.</p>
           <div className="imp-row">
             <span className="imp-label">Players</span>
             <div className="stepper">

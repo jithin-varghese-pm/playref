@@ -1,0 +1,19 @@
+{
+  "name": "Playref: rules referee for road-trip games",
+  "short_name": "Playref",
+  "description": "Settle game fights in seconds. UNO rules referee and the Imposter word game. Imposter works offline.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#C8102E",
+  "theme_color": "#C8102E",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [{ "name": "Imposter", "url": "/#/imposter", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }]
+}
