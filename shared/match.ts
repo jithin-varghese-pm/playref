@@ -15,6 +15,12 @@ const GAME_WORDS = [
   'hand', 'round', 'deal', 'player', 'rule', 'stack', 'swap', 'challenge', 'shuffle', '7', '0', 'seven', 'zero',
 ];
 
+/** True when the text is clearly about a card game. */
+export function hasGameWords(question: string): boolean {
+  const text = normalize(question);
+  return GAME_WORDS.some((w) => hits(text, w));
+}
+
 /** A phrase hits when it appears at the start of a word (so "stack" also hits "stacking"). */
 function hits(text: string, phrase: string): boolean {
   return new RegExp(`(?:^| )${escape(normalize(phrase))}`).test(text);

@@ -2,7 +2,20 @@ import { normalize } from '../shared/normalize';
 
 /** Abuse in English and common Indian slang. Whole words, plus word starts for the f-word family. */
 const ABUSE_STARTS = ['fuck', 'fuk', 'fck', 'motherfuck', 'bitch', 'asshole', 'bastard', 'cunt', 'dickhead', 'chutiya', 'madarchod', 'behenchod', 'bhenchod', 'bhosdi'];
-const ABUSE_WORDS = ['shit', 'dick', 'slut', 'whore', 'wtf', 'stfu', 'gandu', 'randi', 'myre', 'myran', 'thendi', 'kunna', 'poori'];
+const ABUSE_WORDS = ['shit', 'bullshit', 'dick', 'slut', 'whore', 'wtf', 'stfu', 'gandu', 'randi', 'myre', 'myran', 'thendi', 'kunna', 'poori'];
+
+/**
+ * Removes the abusive words and keeps the rest, so "Can I play a Skip on a Reverse? f*** this"
+ * becomes "Can I play a Skip on a Reverse? this". Returns '' if nothing useful is left.
+ */
+export function removeAbuse(input: string): string {
+  return input
+    .split(/\s+/)
+    .filter((w) => !containsAbuse(w))
+    .join(' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
 
 /** Joins spaced-out letters ("f u c k" -> "fuck") and squeezes repeats ("fuuuuck" -> "fuck"). */
 function variants(text: string): string[] {

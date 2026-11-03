@@ -59,6 +59,12 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
         <div className="verdict-q">{answer.question}</div>
       </nav>
 
+      {answer.note && (
+        <div className="cool-note" role="note">
+          {answer.note}
+        </div>
+      )}
+
       {fromAi && (
         <div className="ai-ribbon">
           <SparkIcon />

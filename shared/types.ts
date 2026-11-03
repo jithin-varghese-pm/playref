@@ -34,6 +34,8 @@ export interface Answer {
   source: AnswerSource;
   /** Replaces the verdict word on the card, e.g. "CLASSIC ONLY". */
   label?: string;
+  /** A short friendly line shown above the card, e.g. when the question came with swearing. */
+  note?: string;
 }
 
 export type AskResponse =

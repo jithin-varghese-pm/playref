@@ -233,6 +233,17 @@
       "match": [["how many cards", "deal", "dealt", "cards each", "start with"], ["start", "each", "begin", "hand", "player", "deal"]]
     },
     {
+      "id": "skip-on-reverse",
+      "button": false,
+      "question": "Can I play a Skip on a Reverse?",
+      "verdict": "YES",
+      "line": "Yes, if it's the same colour. A red Skip can go on a red Reverse, but not on a blue one.",
+      "rules": "A Skip can go on a card of the same colour or on another Skip. A Reverse can go on a card of the same colour or on another Reverse. Different action cards only match by colour.",
+      "house": "None common.",
+      "cards": ["R9", "R8", "R4"],
+      "match": [["skip"], ["reverse"]]
+    },
+    {
       "id": "skip-card",
       "button": false,
       "question": "How does the Skip card work?",

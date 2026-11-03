@@ -49,6 +49,33 @@ describe('reply checks', () => {
   });
 });
 
+describe('swearing with a real question (bug #4)', () => {
+  const base = { clientId: 'c', now: 1, evalMode: false };
+
+  it('answers the question, without the swearing, with a friendly note', async () => {
+    const run = vi.fn();
+    const r = await askQuestion(
+      { ...base, question: 'Can I play a Skip on a Reverse? fuck this bullshit. I am angry af' },
+      { ai: { run }, store: new MemoryStore(), model: 'main', guard: true },
+    );
+    expect(r.status).toBe('ok');
+    if (r.status === 'ok') {
+      expect(r.answer.label).toBeUndefined();
+      expect(r.answer.note).toBe("Easy there 😄 Here's the ruling.");
+      expect(r.answer.question).not.toMatch(/fuck|bullshit/i);
+      expect(r.answer.source).toBe('fight');
+    }
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it('still gives a FOUL! card when there is no game question', async () => {
+    for (const q of ['hi are you a fucker', 'fuuuuck this app', 'f u c k you playref']) {
+      const r = await askQuestion({ ...base, question: q }, { ai: { run: vi.fn() }, store: new MemoryStore(), model: 'main' });
+      expect(r.status === 'ok' && r.answer.label, q).toBe('FOUL!');
+    }
+  });
+});
+
 describe('safety model (Llama Guard)', () => {
   it('reads its text and object replies', () => {
     expect(parseGuard({ response: 'safe' })).toEqual({ safe: true });

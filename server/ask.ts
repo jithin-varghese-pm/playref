@@ -1,5 +1,6 @@
 import { RULES_VERSION } from '../shared/generated/rules-data';
-import { matchFight } from '../shared/match';
+import { hasGameWords, matchFight } from '../shared/match';
+import { containsAbuse, removeAbuse } from './abuse';
 import { normalize } from '../shared/normalize';
 import { fightToAnswer } from '../shared/rules';
 import type { Answer, AskResponse } from '../shared/types';
@@ -96,12 +97,29 @@ function isJsonModeFailure(e: unknown): boolean {
   return /JSON Mode couldn.t be met/i.test(String(e instanceof Error ? e.message : e));
 }
 
-/** The whole typed-question path: scope, known fight, saved answer, then (within the hourly limit) AI. */
+export const COOL_DOWN_NOTE = "Easy there 😄 Here's the ruling.";
+
+/**
+ * The whole typed-question path. A real game question that comes with swearing is still
+ * answered (with the swearing removed and a friendly note); swearing with no game question
+ * gets a FOUL! card.
+ */
 export async function askQuestion(input: AskInput, deps: AskDeps): Promise<AskResponse> {
   const question = input.question.trim();
   if (!question) return { status: 'error', message: 'Type a question first.' };
   if (question.length > MAX_QUESTION_LENGTH) return { status: 'error', message: 'Keep it under 300 characters.' };
 
+  if (containsAbuse(question)) {
+    const cleaned = removeAbuse(question);
+    if (!cleaned || !hasGameWords(cleaned)) return { status: 'ok', answer: scopeAnswer(question, 'abuse'), feedbackKey: null };
+    const res = await answerQuestion(cleaned, input, deps);
+    return res.status === 'ok' ? { ...res, answer: { ...res.answer, note: COOL_DOWN_NOTE } } : res;
+  }
+  return answerQuestion(question, input, deps);
+}
+
+/** Scope, known fight, saved answer, then (within the hourly limit) AI. */
+async function answerQuestion(question: string, input: AskInput, deps: AskDeps): Promise<AskResponse> {
   const scope = classifyScope(question);
   if (scope !== 'in') return { status: 'ok', answer: scopeAnswer(question, scope), feedbackKey: null };
 

@@ -1,7 +1,7 @@
 {
-  "ranAt": "2026-11-02T17:26:25.622Z",
+  "ranAt": "2026-11-03T09:20:52.703Z",
   "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-  "rulesVersion": "c3f9b3adccd5",
+  "rulesVersion": "9f5bf6d79331",
   "total": 55,
   "correct": 53,
   "misses": [
@@ -17,8 +17,8 @@
     }
   ],
   "safety": {
-    "total": 21,
-    "passed": 21,
+    "total": 22,
+    "passed": 22,
     "misses": []
   }
 }
