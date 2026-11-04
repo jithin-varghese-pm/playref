@@ -7,7 +7,7 @@ import type { Answer, Verdict } from '../../shared/types';
 import { sendFeedback, track } from '../lib/api';
 import { setReportContext } from '../lib/reportContext';
 import { shareVerdict } from '../lib/share';
-import { readAloud, spokenText, stopReading } from '../lib/speak';
+import { readAloud, stopReading } from '../lib/speak';
 import { Footer } from './Footer';
 
 const CARD_STYLE: Record<Verdict, { bg: string; fg: string }> = {
@@ -21,12 +21,14 @@ const CARD_STYLE: Record<Verdict, { bg: string; fg: string }> = {
 interface Props {
   answer: Answer;
   feedbackKey: string | null;
+  /** This saved AI answer already has its Playref-voice recording. */
+  voice?: boolean;
   onBack: () => void;
   /** Laptop split screen: shown beside the fights, so no back button or footer. */
   embedded?: boolean;
 }
 
-export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }: Props) {
+export function VerdictScreen({ answer, feedbackKey, voice = false, onBack, embedded = false }: Props) {
   const Tag = embedded ? 'section' : 'main';
   const [voted, setVoted] = useState(false);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
     }
     setReading(true);
     setReadMsg(null);
-    const how = await readAloud(spokenText(answer));
+    const how = await readAloud(answer, { feedbackKey, voice });
     setReading(false);
     track('listen', how);
     if (how === 'failed') setReadMsg("Couldn't read it out on this device. Turn the volume up, or read the card aloud.");

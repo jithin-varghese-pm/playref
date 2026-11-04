@@ -42,7 +42,7 @@ function report(title, list) {
   const g = (k) => list.filter((r) => r.event === 'game' && r.key === k).reduce((a, r) => a + r.n, 0);
   console.log(`  Imposter games started: ${g('imposter-start')}   Group wins: ${g('group-win')}   Imposter wins: ${g('imposter-win')}   Cancelled (word said): ${g('imposter-word-said')}`);
   const k = (event, key) => list.filter((r) => r.event === event && r.key === key).reduce((a, r) => a + r.n, 0);
-  console.log(`  Voice questions: ${sum(list, 'voice')} (written down ${k('voice', 'ok')}, not caught ${k('voice', 'empty')}, limited ${k('voice', 'rate_limited')}, AI off ${k('voice', 'ai_off')}, errors ${k('voice', 'error')})   Read aloud: phone voice ${k('listen', 'device')}, cloud voice ${k('listen', 'cloud')}, failed ${k('listen', 'failed')}`);
+  console.log(`  Voice questions: ${sum(list, 'voice')} (written down ${k('voice', 'ok')}, not caught ${k('voice', 'empty')}, limited ${k('voice', 'rate_limited')}, AI off ${k('voice', 'ai_off')}, errors ${k('voice', 'error')})   Read aloud: Playref voice ${k('listen', 'clip') + k('listen', 'aoede')}, phone voice ${k('listen', 'device')}, cloud voice ${k('listen', 'cloud')}, failed ${k('listen', 'failed')}`);
   console.log(`  Opened About: ${list.filter((r) => r.event === 'page' && r.key === 'about').reduce((a, r) => a + r.n, 0)}   Opened Accuracy: ${list.filter((r) => r.event === 'page' && r.key === 'accuracy').reduce((a, r) => a + r.n, 0)}`);
 }
 

@@ -22,7 +22,8 @@ Goal: real people use it, and we measure it honestly.
 
 ## Built 4 Nov 2026: voice questions and read-aloud
 
-Mic button beside Ask (Whisper writes the question down for the player to check), and "Read it out" on every verdict (the phone's voice, MeloTTS as the fallback). Measure with `npm run usage` (`voice` and `listen` events).
+Mic button beside Ask (Whisper writes the question down for the player to check), and "Read it out" on every verdict in the Playref voice (Gemini Aoede: fixed answers shipped as clips, saved AI answers recorded in the background).
+- Run `npm run voice` once a day until all 43 fixed clips are made (Google's free tier: 10 a day). Measure with `npm run usage` (`voice` and `listen` events).
 
 ## Shipped 3 Nov 2026: Imposter (game 2)
 

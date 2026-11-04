@@ -14,7 +14,7 @@ const ALLOWED: Record<string, Set<string>> = {
   page: new Set(['about', 'accuracy']),
   vote: new Set(['yes', 'no']),
   /** Read-aloud taps: the phone's own voice, or the cloud voice when the phone has none. */
-  listen: new Set(['device', 'cloud', 'failed']),
+  listen: new Set(['clip', 'aoede', 'device', 'cloud', 'failed']),
 };
 
 export function isAllowedEvent(event: unknown, key: unknown): event is string {

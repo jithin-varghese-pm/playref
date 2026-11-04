@@ -78,7 +78,7 @@ export function About() {
 
       <section className="detail">
         <h2>Built with</h2>
-        <p>React and TypeScript, Cloudflare Pages, Workers AI (Llama 3.3 70B, Whisper for voice questions, MeloTTS as a read-aloud fallback) and D1, with tests and auto-deploy on GitHub Actions. Built with Claude as a coding partner.</p>
+        <p>React and TypeScript, Cloudflare Pages, Workers AI (Llama 3.3 70B, Whisper for voice questions), Gemini text-to-speech for the Playref voice and D1, with tests and auto-deploy on GitHub Actions. Built with Claude as a coding partner.</p>
       </section>
 
       <section className="about-cta">

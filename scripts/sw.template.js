@@ -4,10 +4,13 @@
  *   Imposter and the common UNO fights open with no signal.
  * - Fonts are hosted with the app, so they are saved too.
  * - /api is never cached: AI questions, feedback and reports always need the network.
+ * - Playref-voice clips (/voice/) are saved the first time they play, in their own cache that
+ *   app updates keep (a clip's name changes whenever its words do).
  */
 const VERSION = '__VERSION__';
 const PRECACHE = __PRECACHE__;
 const SHELL = `playref-shell-${VERSION}`;
+const VOICE = 'playref-voice-v1';
 /** On a weak signal, wait this long for a fresh page before using the saved one. */
 const PAGE_TIMEOUT_MS = 3000;
 
@@ -24,7 +27,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches
       .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('playref-') && k !== SHELL).map((k) => caches.delete(k))))
+      .then((keys) => Promise.all(keys.filter((k) => k.startsWith('playref-') && k !== SHELL && k !== VOICE).map((k) => caches.delete(k))))
       .then(() => self.clients.claim()),
   );
 });
@@ -55,6 +58,16 @@ async function savedFirst(request, cacheName) {
   return res;
 }
 
+/** Voice clips: saved copy first; only full (200) replies are saved, never partial (206) ones. */
+async function voiceClip(request) {
+  const cache = await caches.open(VOICE);
+  const hit = await cache.match(request.url);
+  if (hit) return hit;
+  const res = await fetch(request.url);
+  if (res.status === 200) cache.put(request.url, res.clone()).catch(() => {});
+  return res;
+}
+
 async function networkFirst(request) {
   try {
     return await fetch(request);
@@ -71,6 +84,7 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === self.location.origin) {
     if (url.pathname.startsWith('/api/')) return;
     if (request.mode === 'navigate') return event.respondWith(page(request));
+    if (url.pathname.startsWith('/voice/') && !PRECACHE.includes(url.pathname)) return event.respondWith(voiceClip(request));
     if (url.pathname.startsWith('/assets/') || PRECACHE.includes(url.pathname)) return event.respondWith(savedFirst(request, SHELL));
     return event.respondWith(networkFirst(request));
   }

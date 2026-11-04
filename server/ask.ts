@@ -9,6 +9,7 @@ import { buildAiInput } from './prompt';
 import { classifyScope, type Scope } from './scope';
 import type { Store } from './store';
 import { notSure, validateAiReply } from './validate';
+import { hasSavedVoice } from './voice';
 
 export const RATE_LIMIT_PER_HOUR = 10;
 export const MAX_QUESTION_LENGTH = 300;
@@ -39,7 +40,8 @@ export interface AskDeps {
 
 type Blocked = Exclude<Scope, 'in'> | 'unsafe';
 
-const SCOPE_ANSWERS: Record<Blocked, Omit<Answer, 'question'>> = {
+/** The fixed cards for blocked questions. Exported so their read-aloud clips can be made in advance. */
+export const SCOPE_ANSWERS: Record<Blocked, Omit<Answer, 'question'>> = {
   unsafe: {
     verdict: 'NOT SURE',
     label: 'NOT HERE',
@@ -146,7 +148,7 @@ async function answerQuestion(question: string, input: AskInput, deps: AskDeps):
   if (!input.evalMode && cacheable) {
     try {
       const saved = await deps.store.getSaved(key, RULES_VERSION);
-      if (saved) return { status: 'ok', answer: { ...saved, question, source: 'saved' }, feedbackKey: key };
+      if (saved) return { status: 'ok', answer: { ...saved, question, source: 'saved' }, feedbackKey: key, voice: await hasSavedVoice(saved, deps.store) };
     } catch {
       // Database trouble: carry on without saved answers.
     }

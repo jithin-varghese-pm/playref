@@ -28,6 +28,27 @@ export interface Store {
   deleteSaved(key: string, version: string): Promise<void>;
   /** Adds one to the daily total for an action (usage counter). */
   bump(day: string, event: string, key: string): Promise<void>;
+  /** Counts hits in a bucket since a time, without adding one (for shared budgets). */
+  countHits(bucket: string, since: number): Promise<number>;
+  addHit(bucket: string, at: number): Promise<void>;
+  /** A Playref-voice clip: the audio, 'pending' while it is being made, or null. */
+  getVoice(key: string): Promise<Uint8Array | 'pending' | null>;
+  /** True when the clip is recorded (without reading the audio). */
+  hasVoice(key: string): Promise<boolean>;
+  /** Marks a clip as being made. False when it exists, or another request started it in the last 2 minutes. */
+  startVoice(key: string, now: number): Promise<boolean>;
+  saveVoice(key: string, audio: Uint8Array, now: number): Promise<void>;
+  dropVoice(key: string): Promise<void>;
+}
+
+/** A clip marked as being made for longer than this is treated as failed and can be made again. */
+export const VOICE_PENDING_MS = 120_000;
+
+function toBytes(v: unknown): Uint8Array | null {
+  if (v instanceof Uint8Array) return v;
+  if (v instanceof ArrayBuffer) return new Uint8Array(v);
+  if (Array.isArray(v)) return Uint8Array.from(v as number[]);
+  return null;
 }
 
 export class MemoryStore implements Store, ReportStore, GapStore {
@@ -76,6 +97,33 @@ export class MemoryStore implements Store, ReportStore, GapStore {
   async bump(day: string, event: string, key: string) {
     const k = `${day}|${event}|${key}`;
     this.counts.set(k, (this.counts.get(k) ?? 0) + 1);
+  }
+  async countHits(bucket: string, since: number) {
+    return this.hits.filter((h) => h.clientId === bucket && h.at > since).length;
+  }
+  async addHit(bucket: string, at: number) {
+    this.hits.push({ clientId: bucket, at });
+  }
+  voices = new Map<string, { audio: Uint8Array | null; at: number }>();
+  async getVoice(key: string) {
+    const v = this.voices.get(key);
+    return v ? (v.audio ?? 'pending') : null;
+  }
+  async hasVoice(key: string) {
+    return Boolean(this.voices.get(key)?.audio);
+  }
+  async startVoice(key: string, now: number) {
+    const v = this.voices.get(key);
+    if (v && (v.audio || v.at > now - VOICE_PENDING_MS)) return false;
+    this.voices.set(key, { audio: null, at: now });
+    return true;
+  }
+  async saveVoice(key: string, audio: Uint8Array, now: number) {
+    this.voices.set(key, { audio, at: now });
+  }
+  async dropVoice(key: string) {
+    const v = this.voices.get(key);
+    if (v && !v.audio) this.voices.delete(key);
   }
 }
 
@@ -152,5 +200,37 @@ export class D1Store implements Store, ReportStore, GapStore {
       .prepare('INSERT INTO daily_counts (day, event, key, n) VALUES (?, ?, ?, 1) ON CONFLICT (day, event, key) DO UPDATE SET n = n + 1')
       .bind(day, event, key)
       .run();
+  }
+  async countHits(bucket: string, since: number) {
+    const row = await this.db.prepare('SELECT COUNT(*) AS n FROM rate_hits WHERE client_id = ? AND at > ?').bind(bucket, since).first<{ n: number }>();
+    return row?.n ?? 0;
+  }
+  async addHit(bucket: string, at: number) {
+    await this.db.prepare('INSERT INTO rate_hits (client_id, at) VALUES (?, ?)').bind(bucket, at).run();
+  }
+  async getVoice(key: string) {
+    const row = await this.db.prepare('SELECT audio FROM voice_clips WHERE key = ?').bind(key).first<{ audio: unknown }>();
+    if (!row) return null;
+    return toBytes(row.audio) ?? 'pending';
+  }
+  async hasVoice(key: string) {
+    return Boolean(await this.db.prepare('SELECT 1 AS ok FROM voice_clips WHERE key = ? AND audio IS NOT NULL').bind(key).first());
+  }
+  async startVoice(key: string, now: number) {
+    // Insert a "being made" row, or take over one that was left pending too long. Only one request wins.
+    const res = await this.db
+      .prepare('INSERT INTO voice_clips (key, audio, created_at) VALUES (?, NULL, ?) ON CONFLICT (key) DO UPDATE SET created_at = excluded.created_at WHERE voice_clips.audio IS NULL AND voice_clips.created_at < ?')
+      .bind(key, now, now - VOICE_PENDING_MS)
+      .run();
+    return (res.meta?.changes ?? 0) > 0;
+  }
+  async saveVoice(key: string, audio: Uint8Array, now: number) {
+    await this.db
+      .prepare('INSERT OR REPLACE INTO voice_clips (key, audio, created_at) VALUES (?, ?, ?)')
+      .bind(key, audio.buffer.slice(audio.byteOffset, audio.byteOffset + audio.byteLength), now)
+      .run();
+  }
+  async dropVoice(key: string) {
+    await this.db.prepare('DELETE FROM voice_clips WHERE key = ? AND audio IS NULL').bind(key).run();
   }
 }

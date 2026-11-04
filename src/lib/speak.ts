@@ -1,61 +1,80 @@
 /**
- * "Read it out": the phone's own voice first (free, no AI, works offline on most phones).
- * If the browser has no voice, or it fails to start, a cloud voice (MeloTTS) reads it instead.
+ * "Read it out", in this order:
+ * 1. A fixed answer (fights, blocked-question cards): its Playref-voice (Aoede) clip, shipped with the app.
+ * 2. A saved AI answer that already has its Playref-voice clip: fetched from /api/voice.
+ * 3. Anything else: the phone's own voice (free, no AI, works offline). For a saved AI answer,
+ *    the server records the Playref voice in the background, so the next read uses it.
+ * 4. No working phone voice: the cloud voice (MeloTTS).
+ *
+ * Sound starts inside the tap with no waiting first, because iPhones block sound that starts later.
  */
+import { fitForVoice, spokenText, voiceKey } from '../../shared/spoken';
 import type { Answer } from '../../shared/types';
+import { VOICE_CLIPS } from '../../shared/voiceClips';
 
-const VERDICT_SAID: Record<Answer['verdict'], string> = {
-  YES: 'Yes.',
-  NO: 'No.',
-  'HOUSE RULE': 'House rule.',
-  RULE: 'The rule.',
-  'NOT SURE': 'Not sure.',
-};
+export { spokenText };
+/** Kept for the cloud voice's 600-character limit. */
+export const forCloud = fitForVoice;
 
-/** Card names said the way players say them. */
-function sayable(text: string): string {
-  return text
-    .replace(/\+\s?2\b/g, 'plus 2')
-    .replace(/\+\s?4\b/g, 'plus 4')
-    .replace(/\s+/g, ' ')
-    .trim();
+const CLIPS = new Set(VOICE_CLIPS);
+const SILENCE = '/voice/silence.mp3';
+
+export type ReadResult = 'clip' | 'aoede' | 'device' | 'cloud' | 'failed';
+
+export interface ReadOptions {
+  /** The saved-answer key, for AI answers that can have a Playref-voice clip. */
+  feedbackKey?: string | null;
+  /** The server says this saved answer already has its clip. */
+  voice?: boolean;
 }
-
-function endSentence(s: string): string {
-  return /[.!?]$/.test(s) ? s : `${s}.`;
-}
-
-/** What gets read: the verdict, the one-line ruling, then what the rules say. */
-export function spokenText(a: Pick<Answer, 'verdict' | 'label' | 'line' | 'rules'>): string {
-  const verdict = a.label ? endSentence(a.label.charAt(0) + a.label.slice(1).toLowerCase()) : VERDICT_SAID[a.verdict];
-  return sayable(`${verdict} ${endSentence(a.line)} ${endSentence(a.rules)}`);
-}
-
-/** The cloud voice takes at most 600 characters: cut at the last full sentence that fits. */
-export function forCloud(text: string, max = 600): string {
-  if (text.length <= max) return text;
-  const cut = text.slice(0, max);
-  const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('? '), cut.lastIndexOf('! '));
-  return end > 0 ? cut.slice(0, end + 1) : cut;
-}
-
-export type ReadResult = 'device' | 'cloud' | 'failed';
 
 let stopCurrent: (() => void) | null = null;
+let player: HTMLAudioElement | null = null;
 
 export function stopReading(): void {
   stopCurrent?.();
   stopCurrent = null;
 }
 
+function audioEl(): HTMLAudioElement {
+  player ??= new Audio();
+  return player;
+}
+
+/** Plays a URL on the shared player. Call play() first thing in a tap for iPhones. */
+function play(url: string, revoke = false): Promise<boolean> {
+  const a = audioEl();
+  return new Promise<boolean>((resolve) => {
+    let done = false;
+    const end = (ok: boolean) => {
+      if (done) return;
+      done = true;
+      a.onended = a.onerror = null;
+      if (revoke) URL.revokeObjectURL(url);
+      resolve(ok);
+    };
+    stopCurrent = () => {
+      a.pause();
+      end(true);
+    };
+    a.onended = () => end(true);
+    a.onerror = () => end(false);
+    a.src = url;
+    a.play().catch(() => end(false));
+  });
+}
+
 function pickVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis.getVoices().filter((v) => v.lang?.toLowerCase().startsWith('en'));
-  const rank = (v: SpeechSynthesisVoice) => (v.localService ? 0 : 10) + (/en[-_]in/i.test(v.lang) ? 0 : /en[-_]gb/i.test(v.lang) ? 1 : /en[-_]us/i.test(v.lang) ? 2 : 3);
-  return voices.sort((a, b) => rank(a) - rank(b))[0] ?? null;
+  // Natural-sounding voices first (Edge "Natural", Chrome "Google", iPhone "Enhanced/Premium"), then Indian English.
+  const natural = (v: SpeechSynthesisVoice) => (/natural|neural|enhanced|premium|google/i.test(v.name) ? 0 : 10);
+  const accent = (v: SpeechSynthesisVoice) => (/en[-_]in/i.test(v.lang) ? 0 : /en[-_]gb/i.test(v.lang) ? 1 : /en[-_]us/i.test(v.lang) ? 2 : 3);
+  return voices.sort((a, b) => natural(a) + accent(a) - (natural(b) + accent(b)))[0] ?? null;
 }
 
 /** Reads with the browser's voice. Resolves true when it finished, false if it never started or failed. */
 function readOnDevice(text: string): Promise<boolean> {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window) || typeof SpeechSynthesisUtterance === 'undefined') return Promise.resolve(false);
   return new Promise((resolve) => {
     const synth = window.speechSynthesis;
     synth.cancel();
@@ -70,7 +89,7 @@ function readOnDevice(text: string): Promise<boolean> {
       clearTimeout(timer);
       resolve(ok);
     };
-    // No sound within 2.5 seconds: this browser has no working voice, so use the cloud one.
+    // No sound within 2.5 seconds: this browser has no working voice.
     const timer = setTimeout(() => {
       if (!started) {
         synth.cancel();
@@ -85,7 +104,7 @@ function readOnDevice(text: string): Promise<boolean> {
       const u = new SpeechSynthesisUtterance(part);
       u.lang = voice?.lang ?? 'en-IN';
       if (voice) u.voice = voice;
-      u.rate = 1;
+      u.rate = 0.95;
       u.onstart = () => {
         started = true;
       };
@@ -100,35 +119,54 @@ function readOnDevice(text: string): Promise<boolean> {
   });
 }
 
-async function readInCloud(text: string): Promise<boolean> {
+async function fetchAudio(url: string, body: unknown, timeoutMs: number): Promise<Response | null> {
+  const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+  const t = ctrl ? setTimeout(() => ctrl.abort(), timeoutMs) : null;
   try {
-    const res = await fetch('/api/speak', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: forCloud(text) }) });
-    if (!res.ok) return false;
-    const url = URL.createObjectURL(await res.blob());
-    const audio = new Audio(url);
-    return await new Promise<boolean>((resolve) => {
-      const end = (ok: boolean) => {
-        URL.revokeObjectURL(url);
-        resolve(ok);
-      };
-      stopCurrent = () => {
-        audio.pause();
-        end(true);
-      };
-      audio.onended = () => end(true);
-      audio.onerror = () => end(false);
-      audio.play().catch(() => end(false));
-    });
+    return await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: ctrl?.signal });
   } catch {
-    return false;
+    return null;
+  } finally {
+    if (t) clearTimeout(t);
   }
 }
 
-/** Reads the text out loud and resolves when it ends (or is stopped). */
-export async function readAloud(text: string): Promise<ReadResult> {
-  stopReading();
-  if (typeof window !== 'undefined' && 'speechSynthesis' in window && typeof SpeechSynthesisUtterance !== 'undefined') {
-    if (await readOnDevice(text)) return 'device';
-  }
+async function readInCloud(text: string): Promise<boolean> {
+  const res = await fetchAudio('/api/speak', { text: fitForVoice(text) }, 15_000);
+  if (!res?.ok) return false;
+  return play(URL.createObjectURL(await res.blob()), true);
+}
+
+async function deviceThenCloud(text: string): Promise<ReadResult> {
+  if (await readOnDevice(text)) return 'device';
   return (await readInCloud(text)) ? 'cloud' : 'failed';
+}
+
+/** Reads the answer out loud and resolves when it ends (or is stopped). Call it straight from the tap. */
+export async function readAloud(answer: Answer, opts: ReadOptions = {}): Promise<ReadResult> {
+  stopReading();
+  const text = spokenText(answer);
+  const key = voiceKey(text);
+
+  // 1. A fixed answer: its clip ships with the app.
+  if (CLIPS.has(key)) {
+    if (await play(`/voice/${key}.mp3`)) return 'clip';
+    return deviceThenCloud(text);
+  }
+
+  const isAi = answer.source === 'ai' || answer.source === 'saved';
+  // 2. A saved AI answer with its clip: start a silent clip inside the tap (unlocks sound on iPhones), then fetch.
+  if (isAi && opts.feedbackKey && opts.voice) {
+    void play(SILENCE);
+    const res = await fetchAudio('/api/voice', { key: opts.feedbackKey }, 8000);
+    if (res?.ok && (res.headers.get('Content-Type') ?? '').startsWith('audio/')) {
+      if (await play(URL.createObjectURL(await res.blob()), true)) return 'aoede';
+    }
+    return deviceThenCloud(text);
+  }
+
+  // 3. The phone's voice now. For a saved AI answer, ask the server to record the Playref voice for next time.
+  const reading = deviceThenCloud(text);
+  if (isAi && opts.feedbackKey) void fetchAudio('/api/voice', { key: opts.feedbackKey }, 8000);
+  return reading;
 }

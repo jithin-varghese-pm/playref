@@ -13,7 +13,8 @@
     "eval": "node evals/run.mjs",
     "usage": "node scripts/usage.mjs",
     "feedback": "node scripts/feedback.mjs",
-    "gaps": "node scripts/gaps.mjs"
+    "gaps": "node scripts/gaps.mjs",
+    "voice": "npm run rules && vitest run --config scripts/voice/vitest.config.ts --silent=false"
   },
   "dependencies": {
     "react": "^18.3.1",

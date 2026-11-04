@@ -19,7 +19,11 @@ Questions about other UNO versions (No Mercy, Flip...) or other games are caught
 ## Voice
 
 - **Ask by voice:** tap the mic, speak, tap stop (it stops by itself after 20 seconds). The browser's own recorder makes the clip, so it works in Chrome, Safari, Firefox, Edge, Samsung Internet and Brave. `/api/transcribe` sends it to Whisper (`@cf/openai/whisper-large-v3-turbo`) with a card-name hint and voice-activity filtering, and returns the words. They land in the question box for the player to check; nothing is asked until they tap Ask, so voice goes through exactly the same guardrails as typing. 20 voice questions per person per hour. No audio is stored.
-- **Read it out:** a button on every verdict reads the verdict, the ruling and the rules. The phone's own voice comes first (no AI, works offline on most phones). If the browser has no working voice, `/api/speak` reads it with MeloTTS (`@cf/myshell-ai/melotts`), only for short answer text with no links, contact details or abuse.
+- **Read it out, in the Playref voice:** a button on every verdict reads the verdict, the ruling and the rules in one voice everywhere: Gemini's **Aoede** (`gemini-3.8-flash-tts`, free tier: 3 a minute, 10 a day).
+  - **Fixed answers** (every fight and the blocked-question cards, 43 in all) are recorded once by `npm run voice` and shipped as `public/voice/<key>.mp3`. They play instantly, cost nothing and are saved for offline use after the first play. The script makes only the missing clips and stops when the day's quota is used, so run it again the next day until all are made. The key is a hash of the voice id and the exact words, so editing a fight makes a new clip.
+  - **Saved AI answers:** the first read uses the phone's voice while `/api/voice` records Aoede in the background (at most 3 a day, so the rest of the quota goes to the fixed clips). Later reads play the saved clip from D1 (`voice_clips`). Only answers Playref really saved can be voiced, so nobody can make the Playref voice say anything else.
+  - **Fallbacks:** the phone's own voice (natural voices first), then MeloTTS via `/api/speak` when the browser has no working voice.
+  - Needs the `GEMINI_API_KEY` secret (Google AI Studio, personal account, project "Playref") in Cloudflare and in `.dev.vars` for `npm run voice`.
 - **Cost:** Whisper uses about 47 neurons per audio minute, so a 5-second question is about 4 of the 10,000 free daily neurons.
 
 ## Guardrails

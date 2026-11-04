@@ -11,6 +11,8 @@ import { answerIsRude, hasContactOrDomain } from './abuse';
 import { cleanText } from './http';
 import type { Store } from './store';
 import type { TranscribeResponse } from '../shared/types';
+import { RULES_VERSION } from '../shared/generated/rules-data';
+import { spokenText, VOICE_NAME, VOICE_STYLE, voiceKey, voicePrompt } from '../shared/spoken';
 
 export type { TranscribeResponse };
 
@@ -120,5 +122,125 @@ export async function speak(input: { text: unknown; clientId: string; now: numbe
     return { status: 'ok', audio, type: audioType(audio) };
   } catch (e) {
     return { status: isDailyLimit(e) ? 'ai_off' : 'error' };
+  }
+}
+
+/* ---------- The Playref voice (Gemini, Aoede) for saved AI answers ---------- */
+
+export const GEMINI_TTS_MODEL = 'gemini-3.8-flash-tts';
+/** Google's free tier allows 10 a day for this model; the rest are kept for making the fixed clips (npm run voice). */
+export const GEMINI_RUNTIME_PER_DAY = 3;
+/** Per person per hour: how many new answers one person can have voiced. */
+export const VOICE_MAKE_PER_HOUR = 10;
+const DAY = 86_400_000;
+/** D1 keeps rows up to 2 MB; longer clips are not saved (the phone voice reads them instead). */
+const MAX_CLIP_BYTES = 1_900_000;
+
+export class GeminiError extends Error {
+  constructor(public status: number, message: string) {
+    super(message);
+  }
+}
+
+function wavHeader(dataBytes: number, rate: number): Uint8Array {
+  const b = new ArrayBuffer(44);
+  const v = new DataView(b);
+  const str = (o: number, s: string) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+  str(0, 'RIFF');
+  v.setUint32(4, 36 + dataBytes, true);
+  str(8, 'WAVE');
+  str(12, 'fmt ');
+  v.setUint32(16, 16, true);
+  v.setUint16(20, 1, true); // PCM
+  v.setUint16(22, 1, true); // mono
+  v.setUint32(24, rate, true);
+  v.setUint32(28, rate * 2, true);
+  v.setUint16(32, 2, true);
+  v.setUint16(34, 16, true);
+  str(36, 'data');
+  v.setUint32(40, dataBytes, true);
+  return new Uint8Array(b);
+}
+
+/** Gemini sends 16-bit mono PCM (sometimes already wrapped as WAV). Always returns a playable WAV. */
+export function toWav(bytes: Uint8Array, mimeType: string): Uint8Array {
+  if (String.fromCharCode(...bytes.subarray(0, 4)) === 'RIFF') return bytes;
+  const rate = Number(/rate=(\d+)/.exec(mimeType)?.[1] ?? 24000);
+  const out = new Uint8Array(44 + bytes.byteLength);
+  out.set(wavHeader(bytes.byteLength, rate), 0);
+  out.set(bytes, 44);
+  return out;
+}
+
+/** Asks Gemini to read the text in the Playref voice. Throws GeminiError on any failure. */
+export async function geminiSpeech(text: string, apiKey: string, styleAndVoice: { style: string; voice: string }, fetchFn: typeof fetch = fetch): Promise<Uint8Array> {
+  const res = await fetchFn(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_TTS_MODEL}:generateContent`, {
+    method: 'POST',
+    headers: { 'x-goog-api-key': apiKey, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: voicePrompt(text, styleAndVoice.style) }] }],
+      generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: styleAndVoice.voice } } } },
+    }),
+  });
+  const body = (await res.json().catch(() => null)) as {
+    error?: { message?: string };
+    candidates?: { content?: { parts?: { inlineData?: { data?: string; mimeType?: string } }[] } }[];
+  } | null;
+  if (!res.ok) throw new GeminiError(res.status, body?.error?.message ?? `HTTP ${res.status}`);
+  const part = body?.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;
+  if (!part?.data) throw new GeminiError(502, 'No audio in the reply');
+  return toWav(fromBase64(part.data), part.mimeType ?? '');
+}
+
+export type VoiceResult =
+  | { status: 'ok'; audio: Uint8Array }
+  /** Not recorded yet. `make` (when present) records it in the background for next time. */
+  | { status: 'preparing'; make?: () => Promise<void> }
+  | { status: 'unknown' };
+
+/**
+ * The Playref voice for a saved AI answer, found by its saved-answer key. Only answers Playref
+ * really gave can be voiced, so nobody can make the Playref voice say anything else.
+ */
+export async function voiceForSaved(
+  input: { key: unknown; clientId: string; now: number; apiKey?: string },
+  deps: { store: Store; fetch?: typeof fetch },
+): Promise<VoiceResult> {
+  if (typeof input.key !== 'string' || !input.key || input.key.length > 300) return { status: 'unknown' };
+  const saved = await deps.store.getSaved(input.key, RULES_VERSION);
+  if (!saved) return { status: 'unknown' };
+  const text = spokenText(saved);
+  const vkey = voiceKey(text);
+  const clip = await deps.store.getVoice(vkey);
+  if (clip instanceof Uint8Array) return { status: 'ok', audio: clip };
+  if (clip === 'pending' || !input.apiKey) return { status: 'preparing' };
+  const apiKey = input.apiKey;
+
+  const make = async () => {
+    const { store, now } = { store: deps.store, now: input.now };
+    // Shared daily budget (checked before counting, so refused tries never use it up), then a per-person limit.
+    if ((await store.countHits('gemini-tts', now - DAY)) >= GEMINI_RUNTIME_PER_DAY) return;
+    if (!(await store.claim(`voicemake:${input.clientId}`, VOICE_MAKE_PER_HOUR, HOUR, now))) return;
+    if (!(await store.startVoice(vkey, now))) return;
+    await store.addHit('gemini-tts', now);
+    try {
+      const audio = await geminiSpeech(text, apiKey, { style: VOICE_STYLE, voice: VOICE_NAME }, deps.fetch);
+      if (audio.byteLength > MAX_CLIP_BYTES) return void (await store.dropVoice(vkey));
+      await store.saveVoice(vkey, audio, Date.now());
+    } catch (e) {
+      await store.dropVoice(vkey);
+      // Google says the free quota is used up: stop trying until the window clears.
+      if (e instanceof GeminiError && e.status === 429) for (let i = 0; i < GEMINI_RUNTIME_PER_DAY; i++) await store.addHit('gemini-tts', now);
+    }
+  };
+  return { status: 'preparing', make };
+}
+
+/** True when a saved answer already has its Playref-voice clip (so the app can play it straight away). */
+export async function hasSavedVoice(answer: Parameters<typeof spokenText>[0], store: Store): Promise<boolean> {
+  try {
+    return await store.hasVoice(voiceKey(spokenText(answer)));
+  } catch {
+    return false;
   }
 }

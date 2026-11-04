@@ -49,6 +49,11 @@ function localApi(): Plugin {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify({ status: 'error', message: 'Local mode: voice needs Cloudflare. Run npm run preview:cf to try it.' }));
       });
+      server.middlewares.use('/api/voice', (_req, res) => {
+        res.statusCode = 404;
+        res.setHeader('Content-Type', 'application/json');
+        res.end('{"status":"unknown"}');
+      });
       server.middlewares.use('/api/speak', (_req, res) => {
         res.statusCode = 503;
         res.setHeader('Content-Type', 'application/json');
@@ -79,7 +84,7 @@ function localApi(): Plugin {
 }
 
 /** Files from public/ the offline worker saves on the first visit, next to the built code and styles. */
-const OFFLINE_PUBLIC = ['/', '/favicon.svg', '/mbm-logo.png', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/fonts/inter-latin.woff2', '/fonts/barlow-condensed-800-italic-latin.woff2'];
+const OFFLINE_PUBLIC = ['/', '/favicon.svg', '/mbm-logo.png', '/manifest.webmanifest', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/fonts/inter-latin.woff2', '/fonts/barlow-condensed-800-italic-latin.woff2', '/voice/silence.mp3'];
 
 /** Build only: writes sw.js with the exact files of this build, so the app opens with no signal. */
 function offlineWorker(): Plugin {

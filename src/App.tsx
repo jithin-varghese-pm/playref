@@ -13,7 +13,7 @@ import { Home } from './screens/Home';
 import { Thinking } from './screens/Thinking';
 import { VerdictScreen } from './screens/VerdictScreen';
 
-type Screen = { name: 'home' } | { name: 'thinking' } | { name: 'verdict'; answer: Answer; feedbackKey: string | null };
+type Screen = { name: 'home' } | { name: 'thinking' } | { name: 'verdict'; answer: Answer; feedbackKey: string | null; voice?: boolean };
 
 /** Laptop and wide tablet screens get the split layout. Must match the CSS breakpoint. */
 export const WIDE_QUERY = '(min-width: 900px)';
@@ -69,7 +69,7 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
     // The player moved on (tapped a fight or asked again): a late answer must not replace what they see.
     if (id !== askId.current) return;
     if (res.status === 'ok') {
-      setScreen({ name: 'verdict', answer: res.answer, feedbackKey: res.feedbackKey });
+      setScreen({ name: 'verdict', answer: res.answer, feedbackKey: res.feedbackKey, voice: res.voice });
       return;
     }
     if (res.status === 'rate_limited' || res.status === 'error') {
@@ -112,6 +112,7 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
               embedded
               answer={screen.answer}
               feedbackKey={screen.feedbackKey}
+              voice={screen.voice}
               onBack={goHome}
             />
           )}
@@ -123,6 +124,6 @@ export function App({ minThinkMs = 900 }: { minThinkMs?: number }) {
 
   // Phone: one screen at a time.
   if (screen.name === 'thinking') return <Thinking />;
-  if (screen.name === 'verdict') return <VerdictScreen answer={screen.answer} feedbackKey={screen.feedbackKey} onBack={goHome} />;
+  if (screen.name === 'verdict') return <VerdictScreen answer={screen.answer} feedbackKey={screen.feedbackKey} voice={screen.voice} onBack={goHome} />;
   return home;
 }

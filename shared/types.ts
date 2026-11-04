@@ -41,7 +41,8 @@ export interface Answer {
 }
 
 export type AskResponse =
-  | { status: 'ok'; answer: Answer; feedbackKey: string | null }
+  /** voice: this saved answer already has its Playref-voice recording. */
+  | { status: 'ok'; answer: Answer; feedbackKey: string | null; voice?: boolean }
   | { status: 'ai_off' }
   | { status: 'rate_limited' }
   | { status: 'error'; message: string };
