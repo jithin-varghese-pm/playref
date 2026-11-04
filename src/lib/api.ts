@@ -14,7 +14,7 @@ export async function ask(question: string): Promise<AskResponse> {
 }
 
 /** Usage counter: fire and forget, never blocks or breaks the app. */
-export function track(event: 'tap' | 'share' | 'page' | 'vote' | 'game', key: string): void {
+export function track(event: 'tap' | 'share' | 'page' | 'vote' | 'game' | 'listen', key: string): void {
   try {
     void fetch('/api/event', {
       method: 'POST',

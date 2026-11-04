@@ -38,6 +38,32 @@ export async function readJsonBody(request: Request): Promise<ReadResult> {
   return { ok: true, body: body as Record<string, unknown> };
 }
 
+export type AudioReadResult = { ok: true; audio: Uint8Array } | { ok: false; status: number; error: string };
+
+/**
+ * Reads a recorded voice question: raw audio bytes (not JSON), only from Playref's own pages,
+ * with an audio Content-Type and a size cap checked before and after reading.
+ */
+export async function readAudioBody(request: Request, maxBytes: number): Promise<AudioReadResult> {
+  const origin = request.headers.get('Origin');
+  if (origin && !ALLOWED_ORIGINS.some((re) => re.test(origin))) return { ok: false, status: 403, error: 'Not allowed.' };
+
+  const type = (request.headers.get('Content-Type') ?? '').toLowerCase();
+  if (!type.startsWith('audio/') && !type.startsWith('video/webm')) return { ok: false, status: 415, error: 'Send audio.' };
+
+  const declared = Number(request.headers.get('Content-Length') ?? '0');
+  if (declared > maxBytes) return { ok: false, status: 413, error: 'Too big.' };
+
+  let buf: ArrayBuffer;
+  try {
+    buf = await request.arrayBuffer();
+  } catch {
+    return { ok: false, status: 400, error: 'Bad request.' };
+  }
+  if (buf.byteLength > maxBytes) return { ok: false, status: 413, error: 'Too big.' };
+  return { ok: true, audio: new Uint8Array(buf) };
+}
+
 /**
  * The part of the caller's address used for limits. IPv6 homes get a whole /64 block,
  * so it is grouped by its first four parts; otherwise one home would have endless fresh limits.

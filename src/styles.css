@@ -377,3 +377,28 @@ a.cta-btn, a.cta-btn:hover { color: var(--ink); }
 .imp-dark .imp-quit, .imp-dark .imp-quit .more-link { color: var(--paper); }
 .imp-dark .imp-two { margin-top: 8px; }
 .imp-next:disabled { background: rgba(0, 0, 0, 0.35); color: var(--paper); }
+
+/* Voice questions (4 Nov 2026): mic beside Ask, and "Read it out" on the verdict. */
+.ask-row { display: flex; gap: 8px; align-items: stretch; }
+.ask-row .ask-btn { flex: 1 1 auto; min-width: 0; }
+.mic-btn {
+  flex: 0 0 54px; width: 54px; height: 54px; border: 0; border-radius: 12px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; background: var(--ink); color: var(--sun);
+}
+.mic-btn:hover:not(:disabled) { color: var(--paper); }
+.mic-btn:disabled { background: #bbb; color: #555; cursor: not-allowed; box-shadow: none; }
+.mic-btn.on { background: var(--table); color: var(--paper); animation: mic-pulse 1.2s ease-in-out infinite; }
+.mic-stop { width: 16px; height: 16px; border-radius: 3px; background: var(--paper); }
+@keyframes mic-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(200, 16, 46, 0.55); } 50% { box-shadow: 0 0 0 8px rgba(200, 16, 46, 0); } }
+.voice-status { margin: 0; display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 1.45; color: var(--ink); background: #f3e3e5; padding: 10px 12px; border-radius: 10px; }
+.voice-status.live { font-weight: 600; font-variant-numeric: tabular-nums; }
+.rec-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--table); flex-shrink: 0; animation: blink 1.2s infinite; }
+.read-row { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.read-btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border: 0; border-radius: 999px;
+  background: var(--paper); color: var(--ink); font: 700 15px var(--body); cursor: pointer;
+}
+.read-btn.on { background: var(--sun); }
+@media (prefers-reduced-motion: reduce) {
+  .mic-btn.on, .rec-dot { animation: none; }
+}

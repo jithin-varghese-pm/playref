@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IMPOSTER_CARDS } from '../../shared/generated/imposter-data';
 import { RULE_CARDS } from '../../shared/generated/rules-data';
 import { RULES_SHEET_URL, verdictWord } from '../../shared/rules';
@@ -7,6 +7,7 @@ import type { Answer, Verdict } from '../../shared/types';
 import { sendFeedback, track } from '../lib/api';
 import { setReportContext } from '../lib/reportContext';
 import { shareVerdict } from '../lib/share';
+import { readAloud, spokenText, stopReading } from '../lib/speak';
 import { Footer } from './Footer';
 
 const CARD_STYLE: Record<Verdict, { bg: string; fg: string }> = {
@@ -29,6 +30,24 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
   const Tag = embedded ? 'section' : 'main';
   const [voted, setVoted] = useState(false);
   const [shareMsg, setShareMsg] = useState<string | null>(null);
+  const [reading, setReading] = useState(false);
+  const [readMsg, setReadMsg] = useState<string | null>(null);
+  // Leaving the verdict stops the voice.
+  useEffect(() => () => stopReading(), []);
+
+  async function readOut() {
+    if (reading) {
+      stopReading();
+      setReading(false);
+      return;
+    }
+    setReading(true);
+    setReadMsg(null);
+    const how = await readAloud(spokenText(answer));
+    setReading(false);
+    track('listen', how);
+    if (how === 'failed') setReadMsg("Couldn't read it out on this device. Turn the volume up, or read the card aloud.");
+  }
   // A FOUL! gets a referee's yellow card; a HELLO! gets a friendly blue one.
   const style =
     answer.label === 'FOUL!' ? CARD_STYLE['HOUSE RULE'] : answer.label === 'HELLO!' ? CARD_STYLE.RULE : CARD_STYLE[answer.verdict];
@@ -84,6 +103,21 @@ export function VerdictScreen({ answer, feedbackKey, onBack, embedded = false }:
             <div className="verdict-line">{answer.line}</div>
           </div>
         </section>
+      </div>
+
+      <div className="read-row up1">
+        <button type="button" className={`read-btn tap${reading ? ' on' : ''}`} aria-pressed={reading} onClick={readOut}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4z" />
+            {reading ? <path d="M17 9l4 6M21 9l-4 6" /> : <path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" />}
+          </svg>
+          {reading ? 'Stop reading' : 'Read it out'}
+        </button>
+        {readMsg && (
+          <p className="notice" role="status">
+            {readMsg}
+          </p>
+        )}
       </div>
 
       <a href="#/report" className="wrong-link up1" onClick={() => setReportContext(answer)}>

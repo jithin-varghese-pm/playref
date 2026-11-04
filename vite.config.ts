@@ -44,6 +44,16 @@ function localApi(): Plugin {
         res.setHeader('Content-Type', 'application/json');
         res.end(JSON.stringify(result));
       });
+      // Voice needs Workers AI, which the local server does not have.
+      server.middlewares.use('/api/transcribe', (_req, res) => {
+        res.setHeader('Content-Type', 'application/json');
+        res.end(JSON.stringify({ status: 'error', message: 'Local mode: voice needs Cloudflare. Run npm run preview:cf to try it.' }));
+      });
+      server.middlewares.use('/api/speak', (_req, res) => {
+        res.statusCode = 503;
+        res.setHeader('Content-Type', 'application/json');
+        res.end('{"status":"error"}');
+      });
       // Usage counter is a no-op locally, so local testing never pollutes the real numbers.
       server.middlewares.use('/api/event', (_req, res) => {
         res.statusCode = 204;

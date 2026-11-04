@@ -97,3 +97,5 @@ UNO is a trademark of Mattel, and Mattel actively protects it. I did not find a 
 - https://www.mealeys.com/mealeys/articles/2254765
 - https://support.ingress.com/hc/en-us/articles/41140416541851-Brand-and-Fan-site-Guidelines
 - https://www.zmangames.com/ip-policy/
+
+- 4 Nov 2026: **Voice questions and read-aloud.** Must work in any browser and stay free. Recording uses the browser's own recorder (MediaRecorder), and Whisper on Workers AI writes it down, because the browser speech-recognition API is missing in Firefox, off in Brave and absent in Android WebViews. The words go into the question box for the player to check before asking, so voice never skips the guardrails. Read-aloud uses the phone's own voice, with MeloTTS as the fallback. Audio is never stored. Android app parked for later (TWA is the likely route).

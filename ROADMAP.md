@@ -20,6 +20,10 @@ Goal: real people use it, and we measure it honestly.
 
 **Decision point after "Now":** if people use it and ask about other games, start "Next". If not, stop building and add a "what I learned" section to the case study.
 
+## Built 4 Nov 2026: voice questions and read-aloud
+
+Mic button beside Ask (Whisper writes the question down for the player to check), and "Read it out" on every verdict (the phone's voice, MeloTTS as the fallback). Measure with `npm run usage` (`voice` and `listen` events).
+
 ## Shipped 3 Nov 2026: Imposter (game 2)
 
 One-phone word game with fair picking, Indian word packs and Imposter fights. Measure with `npm run usage` (Imposter games started and finished).

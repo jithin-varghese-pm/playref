@@ -45,3 +45,11 @@ export type AskResponse =
   | { status: 'ai_off' }
   | { status: 'rate_limited' }
   | { status: 'error'; message: string };
+
+/** /api/transcribe: a voice question written down, for the player to check before asking. */
+export type TranscribeResponse =
+  | { status: 'ok'; text: string }
+  | { status: 'empty' }
+  | { status: 'rate_limited' }
+  | { status: 'ai_off' }
+  | { status: 'error'; message: string };

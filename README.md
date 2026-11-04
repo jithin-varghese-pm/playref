@@ -16,6 +16,12 @@ Playref treats AI as the last step, not the first.
 
 Questions about other UNO versions (No Mercy, Flip...) or other games are caught before any AI call.
 
+## Voice
+
+- **Ask by voice:** tap the mic, speak, tap stop (it stops by itself after 20 seconds). The browser's own recorder makes the clip, so it works in Chrome, Safari, Firefox, Edge, Samsung Internet and Brave. `/api/transcribe` sends it to Whisper (`@cf/openai/whisper-large-v3-turbo`) with a card-name hint and voice-activity filtering, and returns the words. They land in the question box for the player to check; nothing is asked until they tap Ask, so voice goes through exactly the same guardrails as typing. 20 voice questions per person per hour. No audio is stored.
+- **Read it out:** a button on every verdict reads the verdict, the ruling and the rules. The phone's own voice comes first (no AI, works offline on most phones). If the browser has no working voice, `/api/speak` reads it with MeloTTS (`@cf/myshell-ai/melotts`), only for short answer text with no links, contact details or abuse.
+- **Cost:** Whisper uses about 47 neurons per audio minute, so a 5-second question is about 4 of the 10,000 free daily neurons.
+
 ## Guardrails
 
 Five layers, each measured by a red-team test set (22 attacks and look-alikes, scored on the Accuracy page):
